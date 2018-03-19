@@ -1,5 +1,5 @@
-package com.fenast.app.ibextube.db.model.movie;// default package
-// Generated Feb 23, 2018 11:30:17 AM by Hibernate Tools 5.2.3.Final
+package com.fenast.app.ibextube.db.model;// default package
+// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class Artist implements java.io.Serializable {
 	private Photo photo;
 	private String firstName;
 	private String lastName;
-	private String gender;
+	private Character gender;
 	private Set<MovieArtist> movieArtists = new HashSet<MovieArtist>(0);
 
 	public Artist() {
@@ -34,7 +34,7 @@ public class Artist implements java.io.Serializable {
 		this.photo = photo;
 	}
 
-	public Artist(int id, Photo photo, String firstName, String lastName, String gender,
+	public Artist(int id, Photo photo, String firstName, String lastName, Character gender,
 			Set<MovieArtist> movieArtists) {
 		this.id = id;
 		this.photo = photo;
@@ -83,12 +83,12 @@ public class Artist implements java.io.Serializable {
 		this.lastName = lastName;
 	}
 
-	@Column(name = "gender", length = 45)
-	public String getGender() {
+	@Column(name = "gender", length = 1)
+	public Character getGender() {
 		return this.gender;
 	}
 
-	public void setGender(String gender) {
+	public void setGender(Character gender) {
 		this.gender = gender;
 	}
 

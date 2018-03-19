@@ -1,5 +1,5 @@
-package com.fenast.app.ibextube.db.model.movie;// default package
-// Generated Feb 23, 2018 11:30:17 AM by Hibernate Tools 5.2.3.Final
+package com.fenast.app.ibextube.db.model;// default package
+// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,7 +23,6 @@ public class Genre implements java.io.Serializable {
 	private GenreType genreType;
 	private String name;
 	private String description;
-	private String typeId;
 	private Set<MovieGenres> movieGenreses = new HashSet<MovieGenres>(0);
 
 	public Genre() {
@@ -34,13 +33,11 @@ public class Genre implements java.io.Serializable {
 		this.genreType = genreType;
 	}
 
-	public Genre(int genreId, GenreType genreType, String name, String description, String typeId,
-			Set<MovieGenres> movieGenreses) {
+	public Genre(int genreId, GenreType genreType, String name, String description, Set<MovieGenres> movieGenreses) {
 		this.genreId = genreId;
 		this.genreType = genreType;
 		this.name = name;
 		this.description = description;
-		this.typeId = typeId;
 		this.movieGenreses = movieGenreses;
 	}
 
@@ -65,7 +62,7 @@ public class Genre implements java.io.Serializable {
 		this.genreType = genreType;
 	}
 
-	@Column(name = "name", length = 45)
+	@Column(name = "name", length = 25)
 	public String getName() {
 		return this.name;
 	}
@@ -81,15 +78,6 @@ public class Genre implements java.io.Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	@Column(name = "typeId", length = 45)
-	public String getTypeId() {
-		return this.typeId;
-	}
-
-	public void setTypeId(String typeId) {
-		this.typeId = typeId;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "genre")

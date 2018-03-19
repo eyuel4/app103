@@ -1,5 +1,5 @@
-package com.fenast.app.ibextube.db.model.movie;// default package
-// Generated Feb 23, 2018 11:30:17 AM by Hibernate Tools 5.2.3.Final
+package com.fenast.app.ibextube.db.model;// default package
+// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class Photo implements java.io.Serializable {
 		this.photoName = photoName;
 	}
 
-	@Column(name = "url", length = 45)
+	@Column(name = "url", length = 50)
 	public String getUrl() {
 		return this.url;
 	}

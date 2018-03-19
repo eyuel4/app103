@@ -1,5 +1,5 @@
-package com.fenast.app.ibextube.db.model.movie;// default package
-// Generated Feb 23, 2018 11:30:17 AM by Hibernate Tools 5.2.3.Final
+package com.fenast.app.ibextube.db.model;// default package
+// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
 
 import java.util.Date;
 import java.util.HashSet;
@@ -23,34 +23,37 @@ import javax.persistence.TemporalType;
 public class Movies implements java.io.Serializable {
 
 	private int movieId;
+	private MovieRating movieRating;
 	private Photo photo;
 	private String title;
 	private String length;
 	private String description;
-	private String releaseDate;
-	private String likeVote;
-	private String dislikeVote;
+	private Date releaseDate;
+	private Integer likeVote;
+	private Integer dislikeVote;
 	private Double averageRating;
 	private Date insDate;
 	private Date lastUseDate;
 	private Set<MovieGenres> movieGenreses = new HashSet<MovieGenres>(0);
-	private Set<MovieRating> movieRatings = new HashSet<MovieRating>(0);
 	private Set<MovieArtist> movieArtists = new HashSet<MovieArtist>(0);
 	private Set<MovieTags> movieTagses = new HashSet<MovieTags>(0);
+	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
 
 	public Movies() {
 	}
 
-	public Movies(int movieId, Photo photo) {
+	public Movies(int movieId, MovieRating movieRating, Photo photo) {
 		this.movieId = movieId;
+		this.movieRating = movieRating;
 		this.photo = photo;
 	}
 
-	public Movies(int movieId, Photo photo, String title, String length, String description, String releaseDate,
-			String likeVote, String dislikeVote, Double averageRating, Date insDate, Date lastUseDate,
-			Set<MovieGenres> movieGenreses, Set<MovieRating> movieRatings, Set<MovieArtist> movieArtists,
-			Set<MovieTags> movieTagses) {
+	public Movies(int movieId, MovieRating movieRating, Photo photo, String title, String length, String description,
+			Date releaseDate, Integer likeVote, Integer dislikeVote, Double averageRating, Date insDate,
+			Date lastUseDate, Set<MovieGenres> movieGenreses, Set<MovieArtist> movieArtists, Set<MovieTags> movieTagses,
+			Set<MovieComment> movieComments) {
 		this.movieId = movieId;
+		this.movieRating = movieRating;
 		this.photo = photo;
 		this.title = title;
 		this.length = length;
@@ -62,9 +65,9 @@ public class Movies implements java.io.Serializable {
 		this.insDate = insDate;
 		this.lastUseDate = lastUseDate;
 		this.movieGenreses = movieGenreses;
-		this.movieRatings = movieRatings;
 		this.movieArtists = movieArtists;
 		this.movieTagses = movieTagses;
+		this.movieComments = movieComments;
 	}
 
 	@Id
@@ -76,6 +79,16 @@ public class Movies implements java.io.Serializable {
 
 	public void setMovieId(int movieId) {
 		this.movieId = movieId;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "MOVIE_RATING_rating_id", nullable = false)
+	public MovieRating getMovieRating() {
+		return this.movieRating;
+	}
+
+	public void setMovieRating(MovieRating movieRating) {
+		this.movieRating = movieRating;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -115,30 +128,31 @@ public class Movies implements java.io.Serializable {
 		this.description = description;
 	}
 
-	@Column(name = "release_date", length = 45)
-	public String getReleaseDate() {
+	@Temporal(TemporalType.DATE)
+	@Column(name = "release_date", length = 10)
+	public Date getReleaseDate() {
 		return this.releaseDate;
 	}
 
-	public void setReleaseDate(String releaseDate) {
+	public void setReleaseDate(Date releaseDate) {
 		this.releaseDate = releaseDate;
 	}
 
-	@Column(name = "like_vote", length = 45)
-	public String getLikeVote() {
+	@Column(name = "like_vote")
+	public Integer getLikeVote() {
 		return this.likeVote;
 	}
 
-	public void setLikeVote(String likeVote) {
+	public void setLikeVote(Integer likeVote) {
 		this.likeVote = likeVote;
 	}
 
-	@Column(name = "dislike_vote", length = 45)
-	public String getDislikeVote() {
+	@Column(name = "dislike_vote")
+	public Integer getDislikeVote() {
 		return this.dislikeVote;
 	}
 
-	public void setDislikeVote(String dislikeVote) {
+	public void setDislikeVote(Integer dislikeVote) {
 		this.dislikeVote = dislikeVote;
 	}
 
@@ -181,15 +195,6 @@ public class Movies implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movies")
-	public Set<MovieRating> getMovieRatings() {
-		return this.movieRatings;
-	}
-
-	public void setMovieRatings(Set<MovieRating> movieRatings) {
-		this.movieRatings = movieRatings;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movies")
 	public Set<MovieArtist> getMovieArtists() {
 		return this.movieArtists;
 	}
@@ -205,6 +210,15 @@ public class Movies implements java.io.Serializable {
 
 	public void setMovieTagses(Set<MovieTags> movieTagses) {
 		this.movieTagses = movieTagses;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movies")
+	public Set<MovieComment> getMovieComments() {
+		return this.movieComments;
+	}
+
+	public void setMovieComments(Set<MovieComment> movieComments) {
+		this.movieComments = movieComments;
 	}
 
 }

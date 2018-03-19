@@ -1,5 +1,5 @@
-package com.fenast.app.ibextube.db.model.movie;// default package
-// Generated Feb 23, 2018 11:30:17 AM by Hibernate Tools 5.2.3.Final
+package com.fenast.app.ibextube.db.model;// default package
+// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,7 @@ import javax.persistence.Table;
 public class User implements java.io.Serializable {
 
 	private int idUser;
-	private Set<MovieRating> movieRatings = new HashSet<MovieRating>(0);
+	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
 
 	public User() {
 	}
@@ -27,9 +27,9 @@ public class User implements java.io.Serializable {
 		this.idUser = idUser;
 	}
 
-	public User(int idUser, Set<MovieRating> movieRatings) {
+	public User(int idUser, Set<MovieComment> movieComments) {
 		this.idUser = idUser;
-		this.movieRatings = movieRatings;
+		this.movieComments = movieComments;
 	}
 
 	@Id
@@ -44,12 +44,12 @@ public class User implements java.io.Serializable {
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<MovieRating> getMovieRatings() {
-		return this.movieRatings;
+	public Set<MovieComment> getMovieComments() {
+		return this.movieComments;
 	}
 
-	public void setMovieRatings(Set<MovieRating> movieRatings) {
-		this.movieRatings = movieRatings;
+	public void setMovieComments(Set<MovieComment> movieComments) {
+		this.movieComments = movieComments;
 	}
 
 }
