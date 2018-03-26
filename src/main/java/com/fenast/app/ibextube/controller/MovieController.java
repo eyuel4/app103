@@ -3,11 +3,9 @@ package com.fenast.app.ibextube.controller;
 import com.fenast.app.ibextube.db.model.Movies;
 import com.fenast.app.ibextube.db.model.Photo;
 import org.springframework.http.MediaType;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.service.ResponseMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +14,7 @@ import java.util.List;
  * Created by taddesee on 3/22/2018.
  */
 @RestController
-@RequestMapping("/ibexapi")
+@RequestMapping("/ibex/api")
 public class MovieController {
 
     @RequestMapping(value = "/movies", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces =  MediaType.APPLICATION_JSON_VALUE)

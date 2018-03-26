@@ -18,6 +18,8 @@ import javax.persistence.Table;
 public class User implements java.io.Serializable {
 
 	private int idUser;
+	private String username;
+	private String password;
 	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
 
 	public User() {
@@ -52,4 +54,21 @@ public class User implements java.io.Serializable {
 		this.movieComments = movieComments;
 	}
 
+	@Column(name = "userName", nullable = false)
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@Column(name = "password", nullable = false)
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 }
