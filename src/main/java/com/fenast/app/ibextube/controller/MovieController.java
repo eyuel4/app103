@@ -2,7 +2,11 @@ package com.fenast.app.ibextube.controller;
 
 import com.fenast.app.ibextube.db.model.Movies;
 import com.fenast.app.ibextube.db.model.Photo;
+import com.fenast.app.ibextube.service.IService.IMovieService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +18,17 @@ import java.util.List;
  * Created by taddesee on 3/22/2018.
  */
 @RestController
-@RequestMapping("/ibex/api")
+@RequestMapping("/ibex/api/v1")
 public class MovieController {
+
+    @Autowired
+    private IMovieService movieService;
 
     @RequestMapping(value = "/movies", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces =  MediaType.APPLICATION_JSON_VALUE)
     public List<Movies> getAllMovies() throws Exception
     {
-        Movies mv = new Movies();
+        return movieService.getAllMovies();
+/*        Movies mv = new Movies();
         mv.setTitle("Black Panther");
         mv.setDescription("best movie");
         mv.setMovieId(100);
@@ -31,6 +39,12 @@ public class MovieController {
         mv.setPhoto(p);
         List<Movies> moviesList = new ArrayList<>();
         moviesList.add(mv);
-        return moviesList;
+        return moviesList;*/
+    }
+
+    @RequestMapping(value = "/movies/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Movies findMoviesById(@PathVariable("id") int movieId) throws Exception
+    {
+        return movieService.findMovieById(movieId);
     }
 }

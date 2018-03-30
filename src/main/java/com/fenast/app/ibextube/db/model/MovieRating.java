@@ -1,5 +1,5 @@
 package com.fenast.app.ibextube.db.model;// default package
-// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
+// Generated Mar 29, 2018 9:00:37 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
 import java.util.HashSet;

@@ -1,5 +1,5 @@
 package com.fenast.app.ibextube.db.model;// default package
-// Generated Feb 26, 2018 3:39:32 PM by Hibernate Tools 5.2.3.Final
+// Generated Mar 29, 2018 9:00:37 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +20,8 @@ public class User implements java.io.Serializable {
 	private int idUser;
 	private String username;
 	private String password;
-	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
+	private String firstName;
+	private String lastName;
 
 	public User() {
 	}
@@ -29,9 +30,12 @@ public class User implements java.io.Serializable {
 		this.idUser = idUser;
 	}
 
-	public User(int idUser, Set<MovieComment> movieComments) {
+	public User(int idUser, String username, String password, String firstName, String lastName) {
 		this.idUser = idUser;
-		this.movieComments = movieComments;
+		this.username = username;
+		this.password = password;
+		this.firstName = firstName;
+		this.lastName = lastName;
 	}
 
 	@Id
@@ -45,30 +49,40 @@ public class User implements java.io.Serializable {
 		this.idUser = idUser;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<MovieComment> getMovieComments() {
-		return this.movieComments;
-	}
-
-	public void setMovieComments(Set<MovieComment> movieComments) {
-		this.movieComments = movieComments;
-	}
-
-	@Column(name = "userName", nullable = false)
+	@Column(name = "username", length = 45)
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public void setUsername(String username) {
 		this.username = username;
 	}
 
-	@Column(name = "password", nullable = false)
+	@Column(name = "password", length = 45)
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	@Column(name = "first_name", length = 45)
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	@Column(name = "last_name", length = 45)
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
 }

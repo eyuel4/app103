@@ -23,7 +23,8 @@ public class UserSeviceImpl implements IUserService {
 
     @Override
     public User findUserByName(String userName) {
-        return userRepository.findByUserName(userName);
+        //return userRepository.findByUserName(userName);
+        return null;
     }
 
     // To Be removed in the future
