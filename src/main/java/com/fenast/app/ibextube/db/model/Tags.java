@@ -21,9 +21,10 @@ import javax.persistence.TemporalType;
 public class Tags implements java.io.Serializable {
 
 	private int tagId;
-	private String value;
 	private Date insDate;
 	private Date lastUpdated;
+	private String value;
+
 
 	public Tags() {
 	}
@@ -32,12 +33,15 @@ public class Tags implements java.io.Serializable {
 		this.tagId = tagId;
 	}
 
-	public Tags(int tagId, String value) {
+	public Tags(int tagId, Date insDate, Date lastUpdated, String value ) {
 		this.tagId = tagId;
+		this.insDate = insDate;
+		this.lastUpdated = lastUpdated;
 		this.value = value;
 	}
 
 	@Id
+
 	@Column(name = "tag_id", unique = true, nullable = false)
 	public int getTagId() {
 		return this.tagId;
@@ -45,15 +49,6 @@ public class Tags implements java.io.Serializable {
 
 	public void setTagId(int tagId) {
 		this.tagId = tagId;
-	}
-
-	@Column(name = "value", length = 25)
-	public String getValue() {
-		return this.value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 	@Temporal(TemporalType.TIMESTAMP)
@@ -76,4 +71,12 @@ public class Tags implements java.io.Serializable {
 		this.lastUpdated = lastUpdated;
 	}
 
+	@Column(name = "value", length = 25)
+	public String getValue() {
+		return this.value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
 }
