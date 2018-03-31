@@ -1,5 +1,5 @@
 package com.fenast.app.ibextube.db.model;// default package
-// Generated Mar 29, 2018 9:00:37 PM by Hibernate Tools 5.2.8.Final
+// Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -24,6 +24,8 @@ public class MovieComment implements java.io.Serializable {
 	private User user;
 	private String comment;
 	private Date commentDate;
+	private Date insDate;
+	private Date lastUpdated;
 
 	public MovieComment() {
 	}
@@ -90,6 +92,26 @@ public class MovieComment implements java.io.Serializable {
 
 	public void setCommentDate(Date commentDate) {
 		this.commentDate = commentDate;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "ins_date", length = 19)
+	public Date getInsDate() {
+		return this.insDate;
+	}
+
+	public void setInsDate(Date insDate) {
+		this.insDate = insDate;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_updated", length = 19)
+	public Date getLastUpdated() {
+		return this.lastUpdated;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 }

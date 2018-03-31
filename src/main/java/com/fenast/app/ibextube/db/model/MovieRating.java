@@ -1,5 +1,5 @@
 package com.fenast.app.ibextube.db.model;// default package
-// Generated Mar 29, 2018 9:00:37 PM by Hibernate Tools 5.2.8.Final
+// Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
 import java.util.HashSet;
@@ -8,6 +8,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -21,21 +23,25 @@ import javax.persistence.TemporalType;
 public class MovieRating implements java.io.Serializable {
 
 	private int ratingId;
+	private User user;
 	private Double ratingPoint;
 	private Integer totalRatingCount;
 	private Date lastRated;
+	private Date insDate;
+	private Date lastUpdated;
 	private Set<Movies> movieses = new HashSet<Movies>(0);
 
 	public MovieRating() {
 	}
 
-	public MovieRating(int ratingId) {
+	public MovieRating(int ratingId, User user) {
 		this.ratingId = ratingId;
+		this.user = user;
 	}
 
-	public MovieRating(int ratingId, Double ratingPoint, Integer totalRatingCount, Date lastRated,
-			Set<Movies> movieses) {
+	public MovieRating(int ratingId, User user, Double ratingPoint, Integer totalRatingCount, Date lastRated, Set<Movies> movieses) {
 		this.ratingId = ratingId;
+		this.user = user;
 		this.ratingPoint = ratingPoint;
 		this.totalRatingCount = totalRatingCount;
 		this.lastRated = lastRated;
@@ -51,6 +57,16 @@ public class MovieRating implements java.io.Serializable {
 
 	public void setRatingId(int ratingId) {
 		this.ratingId = ratingId;
+	}
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_idUSER", nullable = false)
+	public User getUser() {
+		return this.user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Column(name = "rating_point", precision = 22, scale = 0)
@@ -79,6 +95,26 @@ public class MovieRating implements java.io.Serializable {
 
 	public void setLastRated(Date lastRated) {
 		this.lastRated = lastRated;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "ins_date", length = 19)
+	public Date getInsDate() {
+		return this.insDate;
+	}
+
+	public void setInsDate(Date insDate) {
+		this.insDate = insDate;
+	}
+
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_updated", length = 19)
+	public Date getLastUpdated() {
+		return this.lastUpdated;
+	}
+
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movieRating")

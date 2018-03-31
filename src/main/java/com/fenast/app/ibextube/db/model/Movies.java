@@ -1,5 +1,5 @@
 package com.fenast.app.ibextube.db.model;// default package
-// Generated Mar 29, 2018 9:00:37 PM by Hibernate Tools 5.2.8.Final
+// Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ public class Movies implements java.io.Serializable {
 	private Integer dislikeVote;
 	private Double averageRating;
 	private Date insDate;
-	private Date lastUseDate;
+	private Date lastUpdated;
 	private Set<MovieGenres> movieGenreses = new HashSet<MovieGenres>(0);
 	private Set<MovieArtist> movieArtists = new HashSet<MovieArtist>(0);
 	private Set<MovieTags> movieTagses = new HashSet<MovieTags>(0);
@@ -49,8 +49,8 @@ public class Movies implements java.io.Serializable {
 	}
 
 	public Movies(int movieId, MovieRating movieRating, Photo photo, String title, String length, String description,
-			Date releaseDate, Integer likeVote, Integer dislikeVote, Double averageRating, Date insDate,
-			Date lastUseDate, Set<MovieGenres> movieGenreses, Set<MovieArtist> movieArtists, Set<MovieTags> movieTagses,
+			Date releaseDate, Integer likeVote, Integer dislikeVote, Double averageRating,
+			Set<MovieGenres> movieGenreses, Set<MovieArtist> movieArtists, Set<MovieTags> movieTagses,
 			Set<MovieComment> movieComments) {
 		this.movieId = movieId;
 		this.movieRating = movieRating;
@@ -62,8 +62,6 @@ public class Movies implements java.io.Serializable {
 		this.likeVote = likeVote;
 		this.dislikeVote = dislikeVote;
 		this.averageRating = averageRating;
-		this.insDate = insDate;
-		this.lastUseDate = lastUseDate;
 		this.movieGenreses = movieGenreses;
 		this.movieArtists = movieArtists;
 		this.movieTagses = movieTagses;
@@ -71,7 +69,6 @@ public class Movies implements java.io.Serializable {
 	}
 
 	@Id
-
 	@Column(name = "movie_id", unique = true, nullable = false)
 	public int getMovieId() {
 		return this.movieId;
@@ -82,7 +79,7 @@ public class Movies implements java.io.Serializable {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "MOVIE_RATING_rating_id", nullable = false)
+	@JoinColumn(name = "movie_rating_rating_id", nullable = false)
 	public MovieRating getMovieRating() {
 		return this.movieRating;
 	}
@@ -165,8 +162,8 @@ public class Movies implements java.io.Serializable {
 		this.averageRating = averageRating;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "ins_date", length = 10)
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "ins_date", length = 19)
 	public Date getInsDate() {
 		return this.insDate;
 	}
@@ -175,14 +172,14 @@ public class Movies implements java.io.Serializable {
 		this.insDate = insDate;
 	}
 
-	@Temporal(TemporalType.DATE)
-	@Column(name = "last_use_date", length = 10)
-	public Date getLastUseDate() {
-		return this.lastUseDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "last_updated", length = 19)
+	public Date getLastUpdated() {
+		return this.lastUpdated;
 	}
 
-	public void setLastUseDate(Date lastUseDate) {
-		this.lastUseDate = lastUseDate;
+	public void setLastUpdated(Date lastUpdated) {
+		this.lastUpdated = lastUpdated;
 	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movies")
