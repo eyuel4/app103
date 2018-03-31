@@ -27,8 +27,6 @@ public class User implements java.io.Serializable {
 	private String lastName;
 	private Date insDate;
 	private Date lastUpdated;
-	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
-	private Set<MovieRating> movieRatings = new HashSet<MovieRating>(0);
 
 	public User() {
 	}
@@ -37,15 +35,12 @@ public class User implements java.io.Serializable {
 		this.idUser = idUser;
 	}
 
-	public User(int idUser, String username, String password, String firstName, String lastName,
-			Set<MovieComment> movieComments, Set<MovieRating> movieRatings) {
+	public User(int idUser, String username, String password, String firstName, String lastName) {
 		this.idUser = idUser;
 		this.username = username;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.movieComments = movieComments;
-		this.movieRatings = movieRatings;
 	}
 
 	@Id
@@ -115,22 +110,5 @@ public class User implements java.io.Serializable {
 		this.lastUpdated = lastUpdated;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<MovieComment> getMovieComments() {
-		return this.movieComments;
-	}
-
-	public void setMovieComments(Set<MovieComment> movieComments) {
-		this.movieComments = movieComments;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	public Set<MovieRating> getMovieRatings() {
-		return this.movieRatings;
-	}
-
-	public void setMovieRatings(Set<MovieRating> movieRatings) {
-		this.movieRatings = movieRatings;
-	}
 
 }

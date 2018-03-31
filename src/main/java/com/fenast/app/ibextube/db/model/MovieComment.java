@@ -75,7 +75,7 @@ public class MovieComment implements java.io.Serializable {
 		this.user = user;
 	}
 
-	@Column(name = "comment", length = 45)
+	@Column(name = "comment", length = 200)
 	public String getComment() {
 		return this.comment;
 	}

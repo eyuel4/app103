@@ -23,7 +23,6 @@ import javax.persistence.TemporalType;
 public class Movies implements java.io.Serializable {
 
 	private int movieId;
-	private MovieRating movieRating;
 	private Photo photo;
 	private String title;
 	private String length;
@@ -38,22 +37,22 @@ public class Movies implements java.io.Serializable {
 	private Set<MovieArtist> movieArtists = new HashSet<MovieArtist>(0);
 	private Set<MovieTags> movieTagses = new HashSet<MovieTags>(0);
 	private Set<MovieComment> movieComments = new HashSet<MovieComment>(0);
+	private Set<MovieRating> movieRatings = new HashSet<MovieRating>(0);
 
 	public Movies() {
 	}
 
-	public Movies(int movieId, MovieRating movieRating, Photo photo) {
+	public Movies(int movieId , Photo photo) {
 		this.movieId = movieId;
-		this.movieRating = movieRating;
 		this.photo = photo;
 	}
 
-	public Movies(int movieId, MovieRating movieRating, Photo photo, String title, String length, String description,
-			Date releaseDate, Integer likeVote, Integer dislikeVote, Double averageRating,
-			Set<MovieGenres> movieGenreses, Set<MovieArtist> movieArtists, Set<MovieTags> movieTagses,
-			Set<MovieComment> movieComments) {
+	public Movies(int movieId, Photo photo, String title, String length, String description, Date releaseDate,
+				  Integer likeVote, Integer dislikeVote, Double averageRating, Date insDate, Date lastUpdated,
+				  Set<MovieGenres> movieGenreses, Set<MovieRating> movieRatings, Set<MovieTags> movieTagses,
+				  Set<MovieArtist> movieArtists, Set<MovieComment> movieComments) {
 		this.movieId = movieId;
-		this.movieRating = movieRating;
+		this.movieRatings = movieRatings;
 		this.photo = photo;
 		this.title = title;
 		this.length = length;
@@ -76,16 +75,6 @@ public class Movies implements java.io.Serializable {
 
 	public void setMovieId(int movieId) {
 		this.movieId = movieId;
-	}
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "movie_rating_rating_id", nullable = false)
-	public MovieRating getMovieRating() {
-		return this.movieRating;
-	}
-
-	public void setMovieRating(MovieRating movieRating) {
-		this.movieRating = movieRating;
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -216,6 +205,15 @@ public class Movies implements java.io.Serializable {
 
 	public void setMovieComments(Set<MovieComment> movieComments) {
 		this.movieComments = movieComments;
+	}
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "movies")
+	public Set<MovieRating> getMovieRatings() {
+		return this.movieRatings;
+	}
+
+	public void setMovieRatings(Set<MovieRating> movieRatings) {
+		this.movieRatings = movieRatings;
 	}
 
 }
