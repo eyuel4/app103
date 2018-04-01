@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface IMoviesRepository extends JpaRepository<Movies, Integer>{
-/*    @Query("SELECT m FROM Movies m JOIN FETCH m.photo p JOIN FETCH m.movieRating mr WHERE m.movieId = :movieId ")
-    Movies findMoviesById(@Param("movieId") int movieId);*/
+    @Query("SELECT m FROM Movies m JOIN FETCH m.photo p WHERE m.movieId = :movieId ")
+    Movies findMoviesById(@Param("movieId") int movieId);
 }

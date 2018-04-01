@@ -23,7 +23,7 @@ public class MovieServiceImpl implements IMovieService {
 
     @Override
     public Movies findMovieById(int id) {
-       // return moviesRepository.findMoviesById(id);
-        return null;
+        return moviesRepository.findMoviesById(id);
+       // return null;
     }
 }

@@ -25,8 +25,6 @@ public class Photo implements java.io.Serializable {
 	private String url;
 	private Date insDate;
 	private Date lastUpdated;
-	private Set<Artist> artists = new HashSet<Artist>(0);
-	private Set<Movies> movieses = new HashSet<Movies>(0);
 
 	public Photo() {
 	}
@@ -35,13 +33,10 @@ public class Photo implements java.io.Serializable {
 		this.photoId = photoId;
 	}
 
-	public Photo(int photoId, String photoName, String url, Set<Artist> artists,
-			Set<Movies> movieses) {
+	public Photo(int photoId, String photoName, String url) {
 		this.photoId = photoId;
 		this.photoName = photoName;
 		this.url = url;
-		this.artists = artists;
-		this.movieses = movieses;
 	}
 
 	@Id
@@ -90,24 +85,6 @@ public class Photo implements java.io.Serializable {
 
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "photo")
-	public Set<Artist> getArtists() {
-		return this.artists;
-	}
-
-	public void setArtists(Set<Artist> artists) {
-		this.artists = artists;
-	}
-
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "photo")
-	public Set<Movies> getMovieses() {
-		return this.movieses;
-	}
-
-	public void setMovieses(Set<Movies> movieses) {
-		this.movieses = movieses;
 	}
 
 }

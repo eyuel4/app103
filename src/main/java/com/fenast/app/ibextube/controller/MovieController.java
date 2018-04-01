@@ -42,9 +42,9 @@ public class MovieController {
         return moviesList;*/
     }
 
-    @RequestMapping(value = "/movies/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Movies findMoviesById(@PathVariable("id") int movieId) throws Exception
+    @RequestMapping(value = "/movies/100", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Movies findMoviesById() throws Exception
     {
-        return movieService.findMovieById(movieId);
+        return movieService.findMovieById(100);
     }
 }
