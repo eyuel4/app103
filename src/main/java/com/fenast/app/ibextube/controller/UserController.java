@@ -32,17 +32,27 @@ public class UserController {
     public String registerUser(@RequestBody User user) throws Exception {
         System.out.println("Singup Controller executed");
         if(user != null) {
+            System.out.println(user);
             User user1 = userService.findUserByName(user.getUsername());
             if(user1 != null) {
                 System.out.println("An account with USERID is saved");
                 return "An Account with USERID already created";
             }
+            else {
+                System.out.println("User Registered");
+                userService.saveUser(user);
+                return "User Registered";
+            }
         }
         else {
-            System.out.println("User Registered");
-            userService.saveUser(user);
-            return "User Registered";
+            System.out.println("User is null");
         }
+
         return null;
+    }
+
+    @RequestMapping(value = "/test", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getTest() throws Exception {
+        return "{Value: Hello World}";
     }
 }

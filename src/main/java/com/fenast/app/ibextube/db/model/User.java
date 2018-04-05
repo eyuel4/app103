@@ -110,5 +110,16 @@ public class User implements java.io.Serializable {
 		this.lastUpdated = lastUpdated;
 	}
 
-
+	@Override
+	public String toString() {
+		return "User{" +
+				"idUser=" + idUser +
+				", username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", insDate=" + insDate +
+				", lastUpdated=" + lastUpdated +
+				'}';
+	}
 }
