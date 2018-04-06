@@ -46,9 +46,8 @@ public class UserController {
         }
         else {
             System.out.println("User is null");
+            return "User is null";
         }
-
-        return null;
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
