@@ -29,10 +29,10 @@ public class UserSeviceImpl implements IUserService {
 
     // To Be removed in the future
     @Override
-    public boolean authenticateUser(User user) {
-        User result = findUserByName(user.getUsername());
+    public boolean authenticateUser(String username, String password) {
+        User result = findUserByName(username);
         if(result != null) {
-            if(user.getUsername().equalsIgnoreCase(result.getUsername()) && user.getPassword().equalsIgnoreCase(result.getPassword())) {
+            if(username.equalsIgnoreCase(result.getUsername()) && password.equalsIgnoreCase(result.getPassword())) {
                 return true;
             }
             else {
