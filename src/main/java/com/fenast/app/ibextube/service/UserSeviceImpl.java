@@ -23,14 +23,20 @@ public class UserSeviceImpl implements IUserService {
 
     @Override
     public User findUserByName(String userName) {
-        //return userRepository.findByUserName(userName);
-        return null;
+        return userRepository.findByUserName(userName);
+        //return null;
     }
 
     // To Be removed in the future
     @Override
     public boolean authenticateUser(String username, String password) {
+        System.out.println(username + " " + password);
         User result = findUserByName(username);
+        if(result == null) {
+            System.out.println("result null");
+
+        }
+
         if(result != null) {
             if(username.equalsIgnoreCase(result.getUsername()) && password.equalsIgnoreCase(result.getPassword())) {
                 return true;

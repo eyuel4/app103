@@ -12,19 +12,22 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
-    @RequestMapping(value = "/authenticate", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String authenticateUser(@RequestBody User user) throws Exception {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public boolean authenticateUser(@RequestBody User user) throws Exception {
         boolean isAuthenticated = false;
- /*       if(user != null) {
-            isAuthenticated = userService.authenticateUser(user);
-        }*/
-
-        if(isAuthenticated) {
+        if(user != null) {
+            if(user.getUsername() != null && user.getPassword() != null) {
+                isAuthenticated = userService.authenticateUser(user.getUsername(), user.getPassword());
+                System.out.println(isAuthenticated);
+            }
+        }
+        return isAuthenticated;
+/*        if(isAuthenticated) {
             return "successfully authenticated";
         }
         else {
             return "UserName and Password Incorrect";
-        }
+        }*/
 
     }
 

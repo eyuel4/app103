@@ -7,6 +7,6 @@ import java.util.List;
 public interface IUserService {
     List<User> getAllUsers();
     User findUserByName(String userName);
-    boolean authenticateUser(User user);
+    boolean authenticateUser(String username, String password);
     User saveUser(User user);
 }
