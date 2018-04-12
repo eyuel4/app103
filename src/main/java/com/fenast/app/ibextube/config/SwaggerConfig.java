@@ -14,7 +14,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * Created by taddesee on 2/23/2018.
  */
 
-@Configuration
+/*@Configuration*/
 @EnableAutoConfiguration
 @EnableSwagger2
 @ComponentScan("com.fenast.app.ibextube")
