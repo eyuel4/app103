@@ -132,6 +132,12 @@
 			<version>2.9.0.pr4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.6</version>
+		</dependency>
+
 		<!-- Spring OAUTH2 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

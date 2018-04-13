@@ -1,4 +1,3 @@
-/*
 package com.fenast.app.ibextube.config.oauth2;
 
 
@@ -23,4 +22,3 @@ public class CustomTokenEnhancer implements TokenEnhancer {
         return accessToken;
     }
 }
-*/
