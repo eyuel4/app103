@@ -1,4 +1,4 @@
-package com.fenast.app.ibextube.config.oauth2;
+package com.fenast.app.ibextube.config.oauth2.resource;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -39,6 +39,6 @@ public class CorsFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
+
 }
