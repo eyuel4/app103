@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -30,21 +31,24 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 @EnableResourceServer
 public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
+/*    @Autowired
+    private JwtAuthenticationEntryPoint unauthorizedHandle;*/
+
     @Override
     public void configure(final HttpSecurity http) throws Exception {
-        http.sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        http//.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+                //.and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers("/auth/**").permitAll()
                 // .antMatchers("/swagger*", "/v2/**")
                 // .access("#oauth2.hasScope('read')")
-                .anyRequest()
-                .permitAll();
+                .anyRequest().authenticated();
 
     }
 
     // JWT token store
-
     @Override
     public void configure(final ResourceServerSecurityConfigurer config) {
         config.tokenServices(tokenServices());
@@ -91,12 +95,23 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
         return new CustomClaimVerifier();
     }
 
+/*
     @Bean
     @Primary
     public DefaultTokenServices tokenServices() {
         final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setTokenStore(tokenStore());
         return defaultTokenServices;
-    }
+    }*/
 
+
+    @Primary
+    @Bean
+    public RemoteTokenServices tokenServices() {
+        final RemoteTokenServices tokenServices = new RemoteTokenServices();
+        tokenServices.setCheckTokenEndpointUrl("http://localhost:8081/ibextubeapp/oauth-server/oauth/check_token");
+        tokenServices.setClientId("fooClientIdPassword");
+        tokenServices.setClientSecret("secret");
+        return tokenServices;
+    }
 }
