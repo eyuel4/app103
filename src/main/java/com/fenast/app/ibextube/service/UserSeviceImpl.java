@@ -4,6 +4,7 @@ import com.fenast.app.ibextube.db.model.User;
 import com.fenast.app.ibextube.db.repository.IUserRepository;
 import com.fenast.app.ibextube.service.IService.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,9 @@ public class UserSeviceImpl implements IUserService {
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public List<User> getAllUsers() {
@@ -34,11 +38,11 @@ public class UserSeviceImpl implements IUserService {
         User result = findUserByName(username);
         if(result == null) {
             System.out.println("result null");
-
         }
 
         if(result != null) {
-            if(username.equalsIgnoreCase(result.getUsername()) && password.equalsIgnoreCase(result.getPassword())) {
+            String encodePassword = passwordEncoder.encode(password);
+            if(username.equalsIgnoreCase(result.getUsername()) && encodePassword.equalsIgnoreCase(result.getPassword())) {
                 return true;
             }
             else {
@@ -50,6 +54,7 @@ public class UserSeviceImpl implements IUserService {
 
     @Override
     public User saveUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 }

@@ -3,6 +3,7 @@ package com.fenast.app.ibextube.db.model;// default package
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ public class User implements java.io.Serializable {
 	private String lastName;
 	private Date insDate;
 	private Date lastUpdated;
+	private List<UserRole> roles;
 
 	public User() {
 	}
@@ -106,6 +108,15 @@ public class User implements java.io.Serializable {
 
 	public void setLastUpdated(Date lastUpdated) {
 		this.lastUpdated = lastUpdated;
+	}
+
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	public List<UserRole> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<UserRole> roles) {
+		this.roles = roles;
 	}
 
 	@Override
