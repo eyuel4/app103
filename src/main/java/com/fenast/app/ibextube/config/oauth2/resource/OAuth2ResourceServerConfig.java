@@ -34,6 +34,9 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
 /*    @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandle;*/
 
+/*    @Autowired
+    private CustomAccessTokenConverter customAccessTokenConverter;*/
+
     @Override
     public void configure(final HttpSecurity http) throws Exception {
         http//.exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
@@ -62,8 +65,8 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-        converter.setSigningKey("123");
-        converter.setJwtClaimsSetVerifier(jwtClaimsSetVerifier());
+      //  converter.setSigningKey("123");
+       // converter.setJwtClaimsSetVerifier(jwtClaimsSetVerifier());
 
         final Resource resource = new ClassPathResource("public.txt");
         String publicKey = null;
