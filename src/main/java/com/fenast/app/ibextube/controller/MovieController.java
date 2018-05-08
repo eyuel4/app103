@@ -18,7 +18,7 @@ import java.util.List;
  * Created by taddesee on 3/22/2018.
  */
 @RestController
-@RequestMapping("/ibex/api/v1")
+@RequestMapping("/ibex/api")
 public class MovieController {
 
     @Autowired

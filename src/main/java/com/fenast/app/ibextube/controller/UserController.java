@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/ibex/api/v1/user")
+@RequestMapping("/ibex/api/user")
 public class UserController {
     @Autowired
     private IUserService userService;
