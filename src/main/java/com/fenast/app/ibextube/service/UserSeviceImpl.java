@@ -31,6 +31,11 @@ public class UserSeviceImpl implements IUserService {
         //return null;
     }
 
+    @Override
+    public User findUserById(int userById) {
+        return userRepository.findUserById(userById);
+    }
+
     // To Be removed in the future
     @Override
     public boolean authenticateUser(String username, String password) {
@@ -56,5 +61,10 @@ public class UserSeviceImpl implements IUserService {
     public User saveUser(User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
+    }
+
+    @Override
+    public void updateUserInfo(User user) {
+        userRepository.save(user);
     }
 }

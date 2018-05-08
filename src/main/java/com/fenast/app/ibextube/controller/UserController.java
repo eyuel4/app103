@@ -57,4 +57,19 @@ public class UserController {
     public String getTest() throws Exception {
         return "{Value: Hello World}";
     }
+
+    @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findUserById(@RequestBody User user) throws Exception {
+        return userService.findUserById(user.getIdUser());
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public User findUserByName(@RequestBody User user) throws Exception {
+        return userService.findUserByName(user.getUsername());
+    }
+
+    @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void updateUserInfo(@RequestBody User user) throws Exception {
+        userService.updateUserInfo(user);
+    }
 }

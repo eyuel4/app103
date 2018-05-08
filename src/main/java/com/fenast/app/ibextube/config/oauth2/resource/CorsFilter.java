@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 /**
  * Created by taddesee on 2/8/2018.
  */
@@ -39,6 +38,6 @@ public class CorsFilter implements Filter {
 
     @Override
     public void destroy() {
-    }
 
+    }
 }
