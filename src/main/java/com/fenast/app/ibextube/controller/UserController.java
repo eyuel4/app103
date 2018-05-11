@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/ibex/api/user")
+@RequestMapping("/ibex/api")
 public class UserController {
     @Autowired
     private IUserService userService;
@@ -59,14 +59,15 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User findUserById(@RequestBody User user) throws Exception {
-        return userService.findUserById(user.getIdUser());
+    public User findUserById(@PathVariable("id") String id) throws Exception {
+        System.out.println("I was here");
+        return userService.findUserByName(id);
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+/*    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public User findUserByName(@RequestBody User user) throws Exception {
         return userService.findUserByName(user.getUsername());
-    }
+    }*/
 
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateUserInfo(@RequestBody User user) throws Exception {
