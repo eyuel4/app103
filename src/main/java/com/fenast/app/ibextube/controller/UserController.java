@@ -60,8 +60,11 @@ public class UserController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public User findUserById(@PathVariable("id") String id) throws Exception {
-        System.out.println("I was here");
-        return userService.findUserByName(id);
+        System.out.println("I was here "+ id);
+        System.out.println(id);
+        User u = userService.findUserByName(id);
+        System.out.println(u);
+        return u;
     }
 
 /*    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
