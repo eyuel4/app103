@@ -1,4 +1,4 @@
-package com.fenast.app.ibextube.db.model;// default package
+package com.fenast.app.ibextube.db.model.resource;// default package
 // Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
@@ -21,7 +21,7 @@ public class MovieComment implements java.io.Serializable {
 
 	private int commentId;
 	private Movies movies;
-	private User user;
+	private UserDetail userDetail;
 	private String comment;
 	private Date commentDate;
 	private Date insDate;
@@ -30,16 +30,16 @@ public class MovieComment implements java.io.Serializable {
 	public MovieComment() {
 	}
 
-	public MovieComment(int commentId, Movies movies, User user) {
+	public MovieComment(int commentId, Movies movies, UserDetail userDetail) {
 		this.commentId = commentId;
 		this.movies = movies;
-		this.user = user;
+		this.userDetail = userDetail;
 	}
 
-	public MovieComment(int commentId, Movies movies, User user, String comment, Date commentDate) {
+	public MovieComment(int commentId, Movies movies, UserDetail userDetail, String comment, Date commentDate) {
 		this.commentId = commentId;
 		this.movies = movies;
-		this.user = user;
+		this.userDetail = userDetail;
 		this.comment = comment;
 		this.commentDate = commentDate;
 	}
@@ -67,12 +67,12 @@ public class MovieComment implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_idUSER", nullable = false)
-	public User getUser() {
-		return this.user;
+	public UserDetail getUserDetail() {
+		return this.userDetail;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserDetail(UserDetail userDetail) {
+		this.userDetail = userDetail;
 	}
 
 	@Column(name = "comment", length = 200)

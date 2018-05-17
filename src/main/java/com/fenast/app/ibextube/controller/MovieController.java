@@ -1,17 +1,13 @@
 package com.fenast.app.ibextube.controller;
 
-import com.fenast.app.ibextube.db.model.Movies;
-import com.fenast.app.ibextube.db.model.Photo;
+import com.fenast.app.ibextube.db.model.resource.Movies;
 import com.fenast.app.ibextube.service.IService.IMovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

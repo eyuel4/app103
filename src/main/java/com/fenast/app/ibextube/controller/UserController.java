@@ -1,7 +1,9 @@
 package com.fenast.app.ibextube.controller;
 
-import com.fenast.app.ibextube.db.model.User;
-import com.fenast.app.ibextube.service.IService.IUserService;
+import com.fenast.app.ibextube.db.model.resource.UserDetail;
+import com.fenast.app.ibextube.db.model.authentication.User;
+import com.fenast.app.ibextube.service.IService.IUserDetailService;
+import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -10,17 +12,20 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/ibex/api")
 public class UserController {
     @Autowired
+    private IUserDetailService userDetailService;
+
+    @Autowired
     private IUserService userService;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public boolean authenticateUser(@RequestBody User user) throws Exception {
+    public boolean authenticateUser(@RequestBody UserDetail userDetail) throws Exception {
         boolean isAuthenticated = false;
-        if(user != null) {
-            if(user.getUsername() != null && user.getPassword() != null) {
-                isAuthenticated = userService.authenticateUser(user.getUsername(), user.getPassword());
+/*        if(userDetail != null) {
+            if(userDetail.getUsername() != null && userDetail.getPassword() != null) {
+                isAuthenticated = userService.authenticateUser(userDetail.getUsername(), userDetail.getPassword());
                 System.out.println(isAuthenticated);
             }
-        }
+        }*/
         return isAuthenticated;
 /*        if(isAuthenticated) {
             return "successfully authenticated";
@@ -32,25 +37,42 @@ public class UserController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String registerUser(@RequestBody User user) throws Exception {
+    public UserDetail registerUser(@RequestBody UserDetail userDetailInput) throws Exception {
         System.out.println("Singup Controller executed");
-        if(user != null) {
-            System.out.println(user);
-            User user1 = userService.findUserByName(user.getUsername());
-            if(user1 != null) {
+        if(userDetailInput != null) {
+            System.out.println(userDetailInput);
+            UserDetail userDetail1 = userDetailService.findUserByName(userDetailInput.getUsername());
+            if(userDetail1 != null) {
                 System.out.println("An account with USERID is saved");
-                return "An Account with USERID already created";
+                System.out.println("An Account with USERID already created");
             }
             else {
-                System.out.println("User Registered");
-                userService.saveUser(user);
-                return "User Registered";
+                User user = new User();
+                user.setEnabled(false);
+                user.setUsername(userDetailInput.getUsername());
+                user.setPassword(userDetailInput.getPassword());
+                User savedUser = userService.saveUser(user);
+
+                UserDetail userDetail = new UserDetail();
+                userDetail.setIdUser(savedUser.getId());
+                userDetail.setUsername(savedUser.getUsername());
+                userDetail.setFirstName(userDetailInput.getFirstName());
+                userDetail.setLastName(userDetailInput.getLastName());
+                userDetail.setPassword(userDetailInput.getPassword());
+
+                System.out.println("UserDetail Registered");
+                UserDetail  x = userDetailService.saveUser(userDetail);
+                if(x != null) {
+                    x.setSuccess(true);
+                }
+               // return "UserDetail Registered";
             }
         }
         else {
-            System.out.println("User is null");
-            return "User is null";
+            System.out.println("UserDetail is null");
+            System.out.println("UserDetail is null");
         }
+        return null;
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,21 +81,21 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User findUserById(@PathVariable("id") String id) throws Exception {
+    public UserDetail findUserById(@PathVariable("id") String id) throws Exception {
         System.out.println("I was here "+ id);
         System.out.println(id);
-        User u = userService.findUserByName(id);
+        UserDetail u = userDetailService.findUserByName(id);
         System.out.println(u);
         return u;
     }
 
 /*    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User findUserByName(@RequestBody User user) throws Exception {
+    public UserDetail findUserByName(@RequestBody UserDetail user) throws Exception {
         return userService.findUserByName(user.getUsername());
     }*/
 
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void updateUserInfo(@RequestBody User user) throws Exception {
-        userService.updateUserInfo(user);
+    public void updateUserInfo(@RequestBody UserDetail userDetail) throws Exception {
+        userDetailService.updateUserInfo(userDetail);
     }
 }

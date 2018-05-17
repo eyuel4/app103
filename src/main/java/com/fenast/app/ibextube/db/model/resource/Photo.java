@@ -1,4 +1,4 @@
-package com.fenast.app.ibextube.db.model;// default package
+package com.fenast.app.ibextube.db.model.resource;// default package
 // Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;

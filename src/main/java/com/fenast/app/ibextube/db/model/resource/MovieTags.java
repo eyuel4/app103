@@ -1,4 +1,4 @@
-package com.fenast.app.ibextube.db.model;
+package com.fenast.app.ibextube.db.model.resource;
 
 import java.util.Date;
 import javax.persistence.*;

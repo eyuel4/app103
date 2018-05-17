@@ -1,12 +1,10 @@
-package com.fenast.app.ibextube.db.repository;
+package com.fenast.app.ibextube.db.repository.resource;
 
-import com.fenast.app.ibextube.db.model.Movies;
+import com.fenast.app.ibextube.db.model.resource.Movies;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface IMoviesRepository extends JpaRepository<Movies, Integer>{

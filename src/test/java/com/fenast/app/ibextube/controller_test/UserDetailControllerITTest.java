@@ -10,6 +10,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @RunWith(SpringJUnit4ClassRunner.class)
 //@ContextConfiguration(classes = com.fenast.app.ibextube.config.SpringConfig.class)
 @WebAppConfiguration
-public class UserControllerITTest {
+public class UserDetailControllerITTest {
 
 }

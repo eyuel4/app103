@@ -44,7 +44,7 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/auth/**", "/ibex/api/signup").permitAll()
                 // .antMatchers("/swagger*", "/v2/**")
                 // .access("#oauth2.hasScope('read')")
                 .anyRequest().authenticated();

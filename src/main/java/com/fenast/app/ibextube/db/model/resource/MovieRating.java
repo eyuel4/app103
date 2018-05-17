@@ -1,16 +1,13 @@
-package com.fenast.app.ibextube.db.model;// default package
+package com.fenast.app.ibextube.db.model.resource;// default package
 // Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -24,7 +21,7 @@ public class MovieRating implements java.io.Serializable {
 
 	private int ratingId;
 	private Movies movies;
-	private User user;
+	private UserDetail userDetail;
 	private Double ratingPoint;
 	private Integer totalRatingCount;
 	private Date lastRated;
@@ -34,17 +31,17 @@ public class MovieRating implements java.io.Serializable {
 	public MovieRating() {
 	}
 
-	public MovieRating(int ratingId, Movies movies, User user) {
+	public MovieRating(int ratingId, Movies movies, UserDetail userDetail) {
 		this.ratingId = ratingId;
 		this.movies = movies;
-		this.user = user;
+		this.userDetail = userDetail;
 	}
 
-	public MovieRating(int ratingId, Movies movies, User user, Double ratingPoint, Integer totalRatingCount,
-					   Date lastUpdated) {
+	public MovieRating(int ratingId, Movies movies, UserDetail userDetail, Double ratingPoint, Integer totalRatingCount,
+                       Date lastUpdated) {
 		this.ratingId = ratingId;
 		this.movies = movies;
-		this.user = user;
+		this.userDetail = userDetail;
 		this.ratingPoint = ratingPoint;
 		this.totalRatingCount = totalRatingCount;
 		this.lastUpdated = lastUpdated;
@@ -73,12 +70,12 @@ public class MovieRating implements java.io.Serializable {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_idUSER", nullable = false)
-	public User getUser() {
-		return this.user;
+	public UserDetail getUserDetail() {
+		return this.userDetail;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUserDetail(UserDetail userDetail) {
+		this.userDetail = userDetail;
 	}
 
 	@Column(name = "rating_point", precision = 22, scale = 0)
