@@ -1,12 +1,7 @@
 package com.fenast.app.ibextube.db.model.resource;// default package
 // Generated Mar 30, 2018 10:22:26 PM by Hibernate Tools 5.2.8.Final
 
-import com.fenast.app.ibextube.http.ResponseMessage;
-
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
@@ -16,7 +11,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "userDetail", catalog = "ibextube")
 @SequenceGenerator(name = "userSeq", initialValue = 1, allocationSize = 100)
-public class UserDetail extends ResponseMessage implements java.io.Serializable  {
+public class UserDetail implements java.io.Serializable  {
 
 	private int idUser;
 	private String username;

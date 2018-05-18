@@ -11,4 +11,5 @@ public interface IUserDetailService {
     boolean authenticateUser(String username, String password);
     UserDetail saveUser(UserDetail userDetail);
     void updateUserInfo(UserDetail userDetail);
+    UserDetail signupUser(UserDetail userDetail);
 }

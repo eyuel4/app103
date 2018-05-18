@@ -2,6 +2,8 @@ package com.fenast.app.ibextube.controller;
 
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.authentication.User;
+import com.fenast.app.ibextube.exception.UserExistException;
+import com.fenast.app.ibextube.exception.UserNotFoundException;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +41,18 @@ public class UserController {
     @RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDetail registerUser(@RequestBody UserDetail userDetailInput) throws Exception {
         System.out.println("Singup Controller executed");
-        if(userDetailInput != null) {
+        if(userDetailInput == null) {
+            throw new UserNotFoundException("Username or Password not provided!");
+        } else {
+            return userDetailService.signupUser(userDetailInput);
+        }
+/*        if(userDetailInput != null) {
             System.out.println(userDetailInput);
             UserDetail userDetail1 = userDetailService.findUserByName(userDetailInput.getUsername());
             if(userDetail1 != null) {
                 System.out.println("An account with USERID is saved");
                 System.out.println("An Account with USERID already created");
+                throw new UserExistException("User Account already exist!");
             }
             else {
                 User user = new User();
@@ -72,7 +80,7 @@ public class UserController {
             System.out.println("UserDetail is null");
             System.out.println("UserDetail is null");
         }
-        return null;
+        return null;*/
     }
 
     @RequestMapping(value = "/test", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
