@@ -23,6 +23,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({ UserNotFoundException.class })
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Object> userNotFound(HttpServletRequest request, UserNotFoundException e) {
-        return new ResponseEntity<Object>("User Not Found Exception", new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<Object>("User Not Found Exception", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({ UserExistException.class })
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Object> userExist(HttpServletRequest request, UserExistException e) {
+        return new ResponseEntity<Object>("User alreay exist with this email or phone!", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
