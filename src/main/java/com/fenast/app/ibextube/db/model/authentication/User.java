@@ -152,4 +152,6 @@ public class User implements  java.io.Serializable {
     public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
+
+
 }

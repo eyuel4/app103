@@ -2,6 +2,7 @@ package com.fenast.app.ibextube.controller;
 
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.authentication.User;
+import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.exception.UserExistException;
 import com.fenast.app.ibextube.exception.UserNotFoundException;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
@@ -9,6 +10,8 @@ import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Calendar;
 
 @RestController
 @RequestMapping("/ibex/api")
@@ -41,10 +44,12 @@ public class UserController {
     @RequestMapping(value = "/signup", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserDetail registerUser(@RequestBody UserDetail userDetailInput) throws Exception {
         System.out.println("Singup Controller executed");
+        UserDetail savedUserDetail = null;
         if(userDetailInput == null) {
             throw new UserNotFoundException("Username or Password not provided!");
         } else {
-            return userDetailService.signupUser(userDetailInput);
+            savedUserDetail = userDetailService.signupUser(userDetailInput);
+            return savedUserDetail;
         }
 /*        if(userDetailInput != null) {
             System.out.println(userDetailInput);
@@ -105,5 +110,23 @@ public class UserController {
     @RequestMapping(value = "/user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateUserInfo(@RequestBody UserDetail userDetail) throws Exception {
         userDetailService.updateUserInfo(userDetail);
+    }
+
+    @RequestMapping(value = "/registerationConfirm", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public void confirmSignup(@RequestParam("token") String token) {
+        VerificationToken verificationToken = userDetailService.getVerificationToken(token);
+        if (verificationToken == null) {
+            // Throw Invalid Token Exception or link expired
+        }
+
+        UserDetail userDetail = verificationToken.getUserDetail();
+        Calendar cal = Calendar.getInstance();
+        if (verificationToken.getExpiryDate().getTime() - cal.getTime().getTime() <= 0) {
+            // Throw link expired exception;
+        }
+
+        // Query from User user UserId
+        // Then set enabled to true
+        // then call user service and update the user
     }
 }

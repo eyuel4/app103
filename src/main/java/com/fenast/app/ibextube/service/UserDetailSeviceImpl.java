@@ -1,9 +1,15 @@
 package com.fenast.app.ibextube.service;
 
+import com.fenast.app.ibextube.constants.AppUrlConstant;
+import com.fenast.app.ibextube.constants.EmailSubjectConstant;
+import com.fenast.app.ibextube.constants.RestEndpointConstants;
 import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
+import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.db.repository.resource.IUserDetailRepository;
+import com.fenast.app.ibextube.db.repository.resource.IVerificationTokenRepository;
 import com.fenast.app.ibextube.exception.UserExistException;
+import com.fenast.app.ibextube.service.IService.IEmailService;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -25,6 +32,12 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private IEmailService emailService;
+
+    @Autowired
+    private IVerificationTokenRepository verificationTokenRepository;
 
     @Override
     public List<UserDetail> getAllUsers() {
@@ -88,6 +101,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             user.setEnabled(false);
             user.setUsername(userDetailInput.getUsername());
             user.setPassword(userDetailInput.getPassword());
+            user.setEnabled(false);
+            user.setAccountLocked(true);
+            user.setCredentialsExpired(true);
+            user.setAccountExpired(true);
             User savedUser = userService.saveUser(user);
 
             UserDetail userDetail = new UserDetail();
@@ -98,8 +115,40 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             userDetail.setPassword(userDetailInput.getPassword());
 
             System.out.println("UserDetail Registered");
-            return saveUser(userDetail);
+
+            UserDetail savedUserDetail = new UserDetail();
+            savedUserDetail = saveUser(userDetail);
+
+            confirmRegisteration(savedUserDetail);
+            return savedUserDetail;
             // return "UserDetail Registered";
         }
+    }
+
+    @Override
+    public void confirmRegisteration(UserDetail userDetail) {
+        String token = UUID.randomUUID().toString();
+        createVerificationToken(userDetail, token, "SIGNUP");
+
+
+        String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
+        emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), confirmationUrl);
+    }
+
+    /**
+     * The following method will save the temporary url generated for signup verification or password reset
+     * @param userDetail
+     * @param token
+     * @param type
+     */
+    @Override
+    public void createVerificationToken(UserDetail userDetail, String token, String type) {
+        VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
+        verificationTokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public VerificationToken getVerificationToken(String verificationToken) {
+        return verificationTokenRepository.findByToken(verificationToken);
     }
 }
