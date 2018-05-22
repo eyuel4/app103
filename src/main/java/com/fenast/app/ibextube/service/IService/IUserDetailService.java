@@ -13,7 +13,7 @@ public interface IUserDetailService {
     UserDetail saveUser(UserDetail userDetail);
     void updateUserInfo(UserDetail userDetail);
     UserDetail signupUser(UserDetail userDetail);
-    void confirmRegisteration(UserDetail userDetail);
+    void confirmRegisteration(UserDetail userDetail, boolean isEmail, boolean isPhone);
     void createVerificationToken(UserDetail userDetail, String token, String type);
     VerificationToken getVerificationToken(String verificationToken);
 }

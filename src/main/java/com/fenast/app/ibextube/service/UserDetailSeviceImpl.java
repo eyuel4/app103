@@ -8,10 +8,13 @@ import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.db.repository.resource.IUserDetailRepository;
 import com.fenast.app.ibextube.db.repository.resource.IVerificationTokenRepository;
+import com.fenast.app.ibextube.exception.InvalidUserInputException;
 import com.fenast.app.ibextube.exception.UserExistException;
 import com.fenast.app.ibextube.service.IService.IEmailService;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
+import com.fenast.app.ibextube.util.EmailValidator;
+import com.fenast.app.ibextube.util.PhoneNumberValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,9 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Autowired
     private IVerificationTokenRepository verificationTokenRepository;
+
+    @Autowired
+    private EmailValidator emailValidatorUtil;
 
     @Override
     public List<UserDetail> getAllUsers() {
@@ -88,15 +94,25 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     }
 
     @Override
-    public UserDetail signupUser(UserDetail userDetailInput) {
+    public UserDetail signupUser(UserDetail userDetailInput) throws InvalidUserInputException {
         System.out.println(userDetailInput);
         UserDetail userDetail1 = findUserByName(userDetailInput.getUsername());
+        boolean isEmail = false;
+        boolean isPhone = false;
+
         if(userDetail1 != null) {
             System.out.println("An account with USERID is saved");
             System.out.println("An Account with USERID already created");
             throw new UserExistException("User Account already exist!");
         }
         else {
+            isPhone = validateInputIsPhone(userDetailInput);
+            if(!isPhone) {
+                isEmail =  validateInputIsEmail(userDetailInput);
+            }
+            else if (!isPhone && !isEmail) {
+                throw new InvalidUserInputException("Invalid User Input");
+            }
             User user = new User();
             user.setEnabled(false);
             user.setUsername(userDetailInput.getUsername());
@@ -119,20 +135,48 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             UserDetail savedUserDetail = new UserDetail();
             savedUserDetail = saveUser(userDetail);
 
-            confirmRegisteration(savedUserDetail);
+            confirmRegisteration(savedUserDetail, isEmail, isPhone);
             return savedUserDetail;
             // return "UserDetail Registered";
         }
     }
 
+    private boolean validateInputIsPhone(UserDetail userDetail) {
+        if (userDetail.getUsername() != null) {
+            return PhoneNumberValidator.validatePhoneNumber(userDetail.getUsername());
+        }
+        return false;
+    }
+
+    private boolean validateInputIsEmail(UserDetail userDetail) {
+        if (userDetail.getUsername() != null) {
+            return emailValidatorUtil.validateEmail(userDetail.getUsername());
+        }
+        return false;
+    }
+
     @Override
-    public void confirmRegisteration(UserDetail userDetail) {
-        String token = UUID.randomUUID().toString();
-        createVerificationToken(userDetail, token, "SIGNUP");
+    public void confirmRegisteration(UserDetail userDetail, boolean isEmail, boolean isPhoneNumber) {
 
 
-        String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
-        emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), confirmationUrl);
+        // Send confirmation code through email
+        if(isEmail) {
+            String token = UUID.randomUUID().toString();
+            createVerificationToken(userDetail, token, "SIGNUP");
+            String x = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl();
+            String xx = "http://localhost:4200/confirm/signup?token="+token;
+            System.out.println(xx);
+            String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
+            System.out.println(confirmationUrl);
+            emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), confirmationUrl);
+        }
+        else if (isPhoneNumber) {
+            // Send Confirmation code using phone number
+        }
+        else {
+            throw new InvalidUserInputException("Invalid User Input");
+        }
+
     }
 
     /**
