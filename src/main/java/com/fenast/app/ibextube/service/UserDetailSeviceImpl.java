@@ -205,4 +205,13 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     public VerificationToken getVerificationToken(String verificationToken) {
         return verificationTokenRepository.findByToken(verificationToken);
     }
+
+    /**
+     * The following method will remove the verification code once user is confirmed
+     * @param verificationToken
+     */
+    @Override
+    public void deleteVerificationToken(VerificationToken verificationToken) {
+        verificationTokenRepository.delete(verificationToken);
+    }
 }

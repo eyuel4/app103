@@ -16,4 +16,5 @@ public interface IUserDetailService {
     void confirmRegisteration(UserDetail userDetail, boolean isEmail, boolean isPhone);
     void createVerificationToken(UserDetail userDetail, String token, String type);
     VerificationToken getVerificationToken(String verificationToken);
+    void deleteVerificationToken(VerificationToken verificationToken);
 }

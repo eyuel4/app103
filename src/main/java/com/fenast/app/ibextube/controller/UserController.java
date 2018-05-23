@@ -3,12 +3,14 @@ package com.fenast.app.ibextube.controller;
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
+import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
 import com.fenast.app.ibextube.exception.UserExistException;
 import com.fenast.app.ibextube.exception.UserNotFoundException;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Calendar;
@@ -112,21 +114,29 @@ public class UserController {
         userDetailService.updateUserInfo(userDetail);
     }
 
-    @RequestMapping(value = "/registerationConfirm", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void confirmSignup(@RequestParam("token") String token) {
+    @RequestMapping(value = "/registeration/confirm", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String confirmSignup(@RequestParam("token") String token) {
         VerificationToken verificationToken = userDetailService.getVerificationToken(token);
         if (verificationToken == null) {
             // Throw Invalid Token Exception or link expired
+            throw new InvalidVerificationTokenException("Invalid verification code or link! User can't be verified");
         }
 
         UserDetail userDetail = verificationToken.getUserDetail();
         Calendar cal = Calendar.getInstance();
         if (verificationToken.getExpiryDate().getTime() - cal.getTime().getTime() <= 0) {
             // Throw link expired exception;
+            throw new InvalidVerificationTokenException("Verification code expired! Please try new verification code");
         }
 
         // Query from User user UserId
         // Then set enabled to true
         // then call user service and update the user
+        User user = userService.findUserByName(userDetail.getUsername());
+        user.setConfirmed(true);
+        userService.saveUser(user);
+
+        userDetailService.deleteVerificationToken(verificationToken);
+        return "Thanks you account is confirmed!";
     }
 }
