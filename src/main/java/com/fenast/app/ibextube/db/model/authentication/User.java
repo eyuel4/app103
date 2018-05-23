@@ -36,6 +36,9 @@ public class User implements  java.io.Serializable {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @Column(name = "confirmed")
+    private boolean confirmed;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_authorities", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
     @OrderBy
@@ -153,5 +156,11 @@ public class User implements  java.io.Serializable {
         this.roles = roles;
     }
 
+    public boolean isConfirmed() {
+        return confirmed;
+    }
 
+    public void setConfirmed(boolean confirmed) {
+        this.confirmed = confirmed;
+    }
 }

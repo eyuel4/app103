@@ -16,10 +16,13 @@ import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import com.fenast.app.ibextube.util.EmailValidator;
 import com.fenast.app.ibextube.util.PhoneNumberValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +47,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Autowired
     private EmailValidator emailValidatorUtil;
+
+    @Autowired
+    private JavaMailSender emailSender;
+
 
     @Override
     public List<UserDetail> getAllUsers() {
@@ -114,13 +121,13 @@ public class UserDetailSeviceImpl implements IUserDetailService {
                 throw new InvalidUserInputException("Invalid User Input");
             }
             User user = new User();
-            user.setEnabled(false);
             user.setUsername(userDetailInput.getUsername());
             user.setPassword(userDetailInput.getPassword());
-            user.setEnabled(false);
+            user.setEnabled(true);
             user.setAccountLocked(true);
             user.setCredentialsExpired(true);
             user.setAccountExpired(true);
+            user.setConfirmed(false);
             User savedUser = userService.saveUser(user);
 
             UserDetail userDetail = new UserDetail();
@@ -165,10 +172,13 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             createVerificationToken(userDetail, token, "SIGNUP");
             String x = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl();
             String xx = "http://localhost:4200/confirm/signup?token="+token;
-            System.out.println(xx);
+            String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
+            System.out.println(x);
             String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
             System.out.println(confirmationUrl);
-            emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), confirmationUrl);
+            emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
+
+            emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
         }
         else if (isPhoneNumber) {
             // Send Confirmation code using phone number
