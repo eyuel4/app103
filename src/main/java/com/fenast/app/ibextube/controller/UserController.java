@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 
 @RestController
@@ -114,17 +116,23 @@ public class UserController {
         userDetailService.updateUserInfo(userDetail);
     }
 
-    @RequestMapping(value = "/registeration/confirm", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String confirmSignup(@RequestParam("token") String token) {
+    @RequestMapping(value = "/registeration/confirm/{token}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String confirmSignup(@PathVariable("token") String token) {
+        System.out.println("I was here to delete token");
         VerificationToken verificationToken = userDetailService.getVerificationToken(token);
         if (verificationToken == null) {
             // Throw Invalid Token Exception or link expired
             throw new InvalidVerificationTokenException("Invalid verification code or link! User can't be verified");
         }
 
+        System.out.println(verificationToken);
         UserDetail userDetail = verificationToken.getUserDetail();
         Calendar cal = Calendar.getInstance();
-        if (verificationToken.getExpiryDate().getTime() - cal.getTime().getTime() <= 0) {
+        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
+        long diff = Math.abs(duration.toMinutes());
+        System.out.println(diff);
+        //verificationToken.getExpiryDate() - LocalDateTime.now()
+        if (diff <= 0) {
             // Throw link expired exception;
             throw new InvalidVerificationTokenException("Verification code expired! Please try new verification code");
         }

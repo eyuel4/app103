@@ -23,6 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.internet.MimeMessage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -171,7 +175,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             String token = UUID.randomUUID().toString();
             createVerificationToken(userDetail, token, "SIGNUP");
             String x = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl();
-            String xx = "http://localhost:4200/confirm/signup?token="+token;
+            String xx = "http://localhost:4200/signup/confirm/"+token;
             String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
             System.out.println(x);
             String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
@@ -198,6 +202,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     @Override
     public void createVerificationToken(UserDetail userDetail, String token, String type) {
         VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        verificationToken.setExpiryDate(localDateTime);
+
         verificationTokenRepository.save(verificationToken);
     }
 

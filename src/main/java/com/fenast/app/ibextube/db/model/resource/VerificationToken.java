@@ -2,6 +2,7 @@ package com.fenast.app.ibextube.db.model.resource;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -16,13 +17,14 @@ public class VerificationToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Temporal(TemporalType.TIMESTAMP)
     private String token;
 
     @OneToOne(targetEntity = UserDetail.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "idUser")
     private UserDetail userDetail;
 
-    private Date expiryDate;
+    private LocalDateTime expiryDate;
 
     private String type;
 
@@ -70,11 +72,11 @@ public class VerificationToken {
         this.userDetail = userDetail;
     }
 
-    public Date getExpiryDate() {
+    public LocalDateTime getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDateTime expiryDate) {
         this.expiryDate = expiryDate;
     }
 
