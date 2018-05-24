@@ -6,6 +6,7 @@ import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
 import com.fenast.app.ibextube.exception.UserExistException;
 import com.fenast.app.ibextube.exception.UserNotFoundException;
+import com.fenast.app.ibextube.http.ResponseMessage;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -101,7 +103,14 @@ public class UserController {
     public UserDetail findUserById(@PathVariable("id") String id) throws Exception {
         System.out.println("I was here "+ id);
         System.out.println(id);
-        UserDetail u = userDetailService.findUserByName(id);
+        int idNum;
+        try {
+            idNum  =Integer.parseInt(id.trim());
+        }
+        catch (NumberFormatException e) {
+            throw e;
+        }
+        UserDetail u = userDetailService.findUserById(idNum);
         System.out.println(u);
         return u;
     }
@@ -117,10 +126,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/registeration/confirm/{token}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String confirmSignup(@PathVariable("token") String token) {
+    public ResponseMessage confirmSignup(@PathVariable("token") String token) {
         System.out.println("I was here to delete token");
         VerificationToken verificationToken = userDetailService.getVerificationToken(token);
         if (verificationToken == null) {
+           // userService.findUserById(verificationToken.get)
             // Throw Invalid Token Exception or link expired
             throw new InvalidVerificationTokenException("Invalid verification code or link! User can't be verified");
         }
@@ -129,7 +139,7 @@ public class UserController {
         UserDetail userDetail = verificationToken.getUserDetail();
         Calendar cal = Calendar.getInstance();
         Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
-        long diff = Math.abs(duration.toMinutes());
+        long diff = Math.abs(duration.toHours());
         System.out.println(diff);
         //verificationToken.getExpiryDate() - LocalDateTime.now()
         if (diff <= 0) {
@@ -140,11 +150,15 @@ public class UserController {
         // Query from User user UserId
         // Then set enabled to true
         // then call user service and update the user
-        User user = userService.findUserByName(userDetail.getUsername());
+       // User user = userService.findUserByName(userDetail.getUsername());
+        User user = userService.findUserById(userDetail.getIdUser());
         user.setConfirmed(true);
         userService.saveUser(user);
 
         userDetailService.deleteVerificationToken(verificationToken);
-        return "Thanks you account is confirmed!";
+        ResponseMessage responseMessage = new ResponseMessage();
+        responseMessage.setSuccess(true);
+        responseMessage.setMessage("Thanks you account is confirmed!");
+        return responseMessage;
     }
 }

@@ -177,12 +177,12 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             String x = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl();
             String xx = "http://localhost:4200/signup/confirm/"+token;
             String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
-            System.out.println(x);
+            System.out.println(xx);
             String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
             System.out.println(confirmationUrl);
-            emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
+            //emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
 
-            emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
+           // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
         }
         else if (isPhoneNumber) {
             // Send Confirmation code using phone number
@@ -204,7 +204,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
 
         LocalDateTime localDateTime = LocalDateTime.now();
-        verificationToken.setExpiryDate(localDateTime);
+        System.out.println(localDateTime + "registered");
+        LocalDateTime expirdate = localDateTime.plusDays(1);
+        System.out.println(expirdate + "expired");
+        verificationToken.setExpiryDate(expirdate);
 
         verificationTokenRepository.save(verificationToken);
     }

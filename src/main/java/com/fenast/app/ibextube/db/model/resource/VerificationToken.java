@@ -17,13 +17,14 @@ public class VerificationToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
+
     private String token;
 
     @OneToOne(targetEntity = UserDetail.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "idUser")
     private UserDetail userDetail;
 
+    @Column(name = "expiryDate")
     private LocalDateTime expiryDate;
 
     private String type;
