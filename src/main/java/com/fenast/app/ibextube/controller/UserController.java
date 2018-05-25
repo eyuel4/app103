@@ -1,5 +1,6 @@
 package com.fenast.app.ibextube.controller;
 
+import com.fenast.app.ibextube.constants.MessageType;
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
@@ -158,7 +159,9 @@ public class UserController {
         userDetailService.deleteVerificationToken(verificationToken);
         ResponseMessage responseMessage = new ResponseMessage();
         responseMessage.setSuccess(true);
+        responseMessage.setMessage_type(MessageType.Message_SUCCESS.getType());
         responseMessage.setMessage("Thanks you account is confirmed!");
+        System.out.println(responseMessage);
         return responseMessage;
     }
 }
