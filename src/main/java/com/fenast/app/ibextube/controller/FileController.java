@@ -20,13 +20,15 @@ public class FileController {
     @Autowired
     private IFileService filesService;
 
-    @RequestMapping(value = "/profile/upload", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/profile/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String handleFileUpload(@RequestParam("file") MultipartFile file) {
         String message = "";
         try {
             filesService.storeFile(file);
+            System.out.println("You successfully uploaded " + file.getOriginalFilename() + "!" );
             return "Filed Upload Completed";
         } catch (Exception e) {
+            System.out.println("Fail to upload profile picture" + file.getOriginalFilename()+ "!");
             return "Fail to upload profile picture";
         }
     }

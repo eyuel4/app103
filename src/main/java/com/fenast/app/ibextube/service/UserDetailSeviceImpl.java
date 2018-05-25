@@ -182,7 +182,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             System.out.println(confirmationUrl);
             //emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
 
-            emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
+           // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
         }
         else if (isPhoneNumber) {
             // Send Confirmation code using phone number
