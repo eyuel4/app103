@@ -7,7 +7,7 @@ import com.fenast.app.ibextube.constants.MessageType;
  * Created by taddesee on 5/24/2018.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseMessage implements java.io.Serializable  {
+public class ResponseMessageBase implements java.io.Serializable  {
 
     private Boolean success;
     private String message;
@@ -57,7 +57,7 @@ public class ResponseMessage implements java.io.Serializable  {
 
     @Override
     public String toString() {
-        return "ResponseMessage{" +
+        return "ResponseMessageBase{" +
                 "success=" + success +
                 ", message='" + message + '\'' +
                 ", error='" + error + '\'' +

@@ -5,17 +5,15 @@ import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
-import com.fenast.app.ibextube.exception.UserExistException;
 import com.fenast.app.ibextube.exception.UserNotFoundException;
-import com.fenast.app.ibextube.http.ResponseMessage;
+import com.fenast.app.ibextube.http.ResponseMessageBase;
+import com.fenast.app.ibextube.http.UserDetailResponse;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -101,7 +99,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserDetail findUserById(@PathVariable("id") String id) throws Exception {
+    public UserDetailResponse getUserDetail(@PathVariable("id") String id) throws Exception {
         System.out.println("I was here "+ id);
         System.out.println(id);
         int idNum;
@@ -111,9 +109,16 @@ public class UserController {
         catch (NumberFormatException e) {
             throw e;
         }
-        UserDetail u = userDetailService.findUserById(idNum);
-        System.out.println(u);
-        return u;
+        UserDetail user = userDetailService.findUserById(idNum);
+
+        UserDetailResponse userDetailResponse = new UserDetailResponse();
+        userDetailResponse.setFirstName(user.getFirstName());
+        userDetailResponse.setLastName(user.getLastName());
+        userDetailResponse.setMiddleName(null);
+        userDetailResponse.setPhotoUrl(user.getProfilePic());
+
+        System.out.println(userDetailResponse);
+        return userDetailResponse;
     }
 
 /*    @RequestMapping(value = "/user", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -127,7 +132,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/registeration/confirm/{token}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseMessage confirmSignup(@PathVariable("token") String token) {
+    public ResponseMessageBase confirmSignup(@PathVariable("token") String token) {
         System.out.println("I was here to delete token");
         VerificationToken verificationToken = userDetailService.getVerificationToken(token);
         if (verificationToken == null) {
@@ -157,11 +162,11 @@ public class UserController {
         userService.saveUser(user);
 
         userDetailService.deleteVerificationToken(verificationToken);
-        ResponseMessage responseMessage = new ResponseMessage();
-        responseMessage.setSuccess(true);
-        responseMessage.setMessage_type(MessageType.Message_SUCCESS.getType());
-        responseMessage.setMessage("Thanks you account is confirmed!");
-        System.out.println(responseMessage);
-        return responseMessage;
+        ResponseMessageBase responseMessageBase = new ResponseMessageBase();
+        responseMessageBase.setSuccess(true);
+        responseMessageBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        responseMessageBase.setMessage("Thanks you account is confirmed!");
+        System.out.println(responseMessageBase);
+        return responseMessageBase;
     }
 }
