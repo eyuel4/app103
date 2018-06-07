@@ -10,8 +10,10 @@ import com.fenast.app.ibextube.http.ResponseMessageBase;
 import com.fenast.app.ibextube.http.UserDetailResponse;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
+import com.fenast.app.ibextube.util.MaskHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
@@ -26,6 +28,9 @@ public class UserController {
 
     @Autowired
     private IUserService userService;
+
+    @Autowired
+    private PasswordEncoder userPasswordEncoder;
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public boolean authenticateUser(@RequestBody UserDetail userDetail) throws Exception {
@@ -168,5 +173,52 @@ public class UserController {
         responseMessageBase.setMessage("Thanks you account is confirmed!");
         System.out.println(responseMessageBase);
         return responseMessageBase;
+    }
+
+    @RequestMapping(value = "/profile/edit/password/{token}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseMessageBase updatePassword(@PathVariable("token") String token, @RequestBody UserDetail userDetailInput ) throws Exception {
+        VerificationToken verificationToken = userDetailService.getVerificationToken(token);
+        if (verificationToken == null) {
+            throw new InvalidVerificationTokenException("Invalid password update link");
+        }
+
+        UserDetail userDetail = verificationToken.getUserDetail();
+        Calendar cal = Calendar.getInstance();
+        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
+        long diff = Math.abs(duration.toHours());
+        if (diff <= 0) {
+            // Throw link expired exception
+            throw new InvalidVerificationTokenException("Verification code expired!");
+        }
+
+        User user = userService.findUserById(userDetail.getIdUser());
+        user.setPassword(userPasswordEncoder.encode(userDetailInput.getPassword()));
+        userService.saveUser(user);
+
+        userDetailService.deleteVerificationToken(verificationToken);
+        ResponseMessageBase responseMessageBase = new ResponseMessageBase();
+        responseMessageBase.setSuccess(true);
+        responseMessageBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        responseMessageBase.setMessage("Your password is updated!");
+        return responseMessageBase;
+    }
+
+    /**
+     * The following endpoint will be called from the angular app when user clicks reset password for first
+     * time. Email or Text will be sent with link
+     * @param userDetailInput
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/profile/edit/password/reset", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseMessageBase resetPassword(@RequestBody UserDetail userDetailInput) throws Exception {
+        System.out.println("Password reset I was called");
+        userDetailService.requestUpdatePassword(userDetailInput);
+
+        ResponseMessageBase respMsgBase = new ResponseMessageBase();
+        respMsgBase.setMessage("Password reset link sent to "+ MaskHelper.maskEmail(userDetailInput.getUsername()));
+        respMsgBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        respMsgBase.setSuccess(true);
+        return respMsgBase;
     }
 }

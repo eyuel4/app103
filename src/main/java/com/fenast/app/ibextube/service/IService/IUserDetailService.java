@@ -17,4 +17,5 @@ public interface IUserDetailService {
     void createVerificationToken(UserDetail userDetail, String token, String type);
     VerificationToken getVerificationToken(String verificationToken);
     void deleteVerificationToken(VerificationToken verificationToken);
+    void requestUpdatePassword(UserDetail userDetail);
 }

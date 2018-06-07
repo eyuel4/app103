@@ -174,11 +174,14 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         if(isEmail) {
             String token = UUID.randomUUID().toString();
             createVerificationToken(userDetail, token, "SIGNUP");
-            String x = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl();
+
+            String url = "http://localhost:4200/signup/confirm/";
             String xx = "http://localhost:4200/signup/confirm/"+token;
             String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
             System.out.println(xx);
             String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
+
+            sendEmail(url, token);
             System.out.println(confirmationUrl);
             //emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
 
@@ -225,4 +228,46 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     public void deleteVerificationToken(VerificationToken verificationToken) {
         verificationTokenRepository.delete(verificationToken);
     }
+
+    /**
+     * The following method will be called the first time the user
+     * call change password. Email will be sent to user with one time verification token
+     * when user click on that it will redirect to update password
+     * @param userDetail
+     */
+    @Override
+    public void requestUpdatePassword(UserDetail userDetail) {
+        UserDetail userDetail1 = userRepository.findByUserName(userDetail.getUsername());
+
+        if (userDetail1 != null) {
+            String token = UUID.randomUUID().toString();
+            createVerificationToken(userDetail1, token, "Update_password");
+            boolean isEmail = validateInputIsEmail(userDetail1);
+            if (isEmail) {
+                String url = "http://local";
+                sendEmail("http://localhost:4200/profile/edit/password/reset/", token);
+            }
+            else {
+                sendSmsText();
+            }
+
+
+        }
+    }
+
+    private void sendEmail(String url, String token) {
+        String xx = url+token;
+        String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
+        System.out.println(xx);
+        String confirmationUrl = url  + token;
+        System.out.println(confirmationUrl);
+        System.out.println(xx);
+
+        // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
+    }
+
+    private void sendSmsText() {
+
+    }
+
 }
