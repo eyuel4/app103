@@ -1,7 +1,7 @@
 package com.fenast.app.ibextube.service;
 
 import com.fenast.app.ibextube.constants.AppUrlConstant;
-import com.fenast.app.ibextube.constants.EmailSubjectConstant;
+import com.fenast.app.ibextube.constants.MessageType;
 import com.fenast.app.ibextube.constants.RestEndpointConstants;
 import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
@@ -9,24 +9,25 @@ import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.db.repository.resource.IUserDetailRepository;
 import com.fenast.app.ibextube.db.repository.resource.IVerificationTokenRepository;
 import com.fenast.app.ibextube.exception.InvalidUserInputException;
+import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
 import com.fenast.app.ibextube.exception.UserExistException;
+import com.fenast.app.ibextube.http.PasswordRequest;
+import com.fenast.app.ibextube.http.ResponseMessageBase;
 import com.fenast.app.ibextube.service.IService.IEmailService;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import com.fenast.app.ibextube.util.EmailValidator;
 import com.fenast.app.ibextube.util.PhoneNumberValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.mail.internet.MimeMessage;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,9 +37,6 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Autowired
     private IUserDetailRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private IUserService userService;
@@ -55,6 +53,12 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     @Autowired
     private JavaMailSender emailSender;
 
+    @Autowired
+    private PasswordEncoder userPasswordEncoder;
+
+    @Autowired
+    @Qualifier(value = "userPasswordEncoder")
+    private PasswordEncoder userPasswordEncoder1;
 
     @Override
     public List<UserDetail> getAllUsers() {
@@ -82,7 +86,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         }
 
         if(result != null) {
-            String encodePassword = passwordEncoder.encode(password);
+            String encodePassword = userPasswordEncoder.encode(password);
 /*            if(username.equalsIgnoreCase(result.getUsername()) && encodePassword.equalsIgnoreCase(result.getPassword())) {
                 return true;
             }
@@ -95,7 +99,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Override
     public UserDetail saveUser(UserDetail userDetail) {
-        //userDetail.setPassword(passwordEncoder.encode(userDetail.getPassword()));
+        userDetail.setPassword(userPasswordEncoder1.encode(userDetail.getPassword()));
         return userRepository.save(userDetail);
     }
 
@@ -220,6 +224,42 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         return verificationTokenRepository.findByToken(verificationToken);
     }
 
+
+    public ResponseMessageBase updatePassword(String token, PasswordRequest passwordRequest) throws Exception {
+        VerificationToken verificationToken = getVerificationToken(token);
+        if (verificationToken == null) {
+            throw new InvalidVerificationTokenException("Invalid password update link");
+        }
+
+        UserDetail userDetail = verificationToken.getUserDetail();
+        Calendar cal = Calendar.getInstance();
+        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
+        long diff = Math.abs(duration.toHours());
+        if (diff <= 0) {
+            // Throw link expired exception
+            throw new InvalidVerificationTokenException("Verification code expired!");
+        }
+
+        User user = userService.findUserById(userDetail.getIdUser());
+        if (user != null) {
+            String oldPasswordEncoded = userPasswordEncoder1.encode(passwordRequest.getOldPassword());
+            if (checkPassword(passwordRequest.getOldPassword(), user.getPassword())) {
+                //user.setPassword(userPasswordEncoder1.encode(passwordRequest.getNewPassword()));
+                user.setPassword(passwordRequest.getNewPassword());
+                userService.saveUser(user);
+                deleteVerificationToken(verificationToken);
+            } else {
+                throw new InvalidVerificationTokenException("Invalid Password");
+            }
+        }
+
+        ResponseMessageBase responseMessageBase = new ResponseMessageBase();
+        responseMessageBase.setSuccess(true);
+        responseMessageBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        responseMessageBase.setMessage("Your password is updated!");
+        return responseMessageBase;
+    }
+
     /**
      * The following method will remove the verification code once user is confirmed
      * @param verificationToken
@@ -238,20 +278,24 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     @Override
     public void requestUpdatePassword(UserDetail userDetail) {
         UserDetail userDetail1 = userRepository.findByUserName(userDetail.getUsername());
+        VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("Update_password",userDetail1.getIdUser());
 
-        if (userDetail1 != null) {
-            String token = UUID.randomUUID().toString();
+        String token = null;
+        if (userDetail1 != null && verificationToken == null) {
+            token = UUID.randomUUID().toString();
             createVerificationToken(userDetail1, token, "Update_password");
-            boolean isEmail = validateInputIsEmail(userDetail1);
-            if (isEmail) {
-                String url = "http://local";
-                sendEmail("http://localhost:4200/profile/edit/password/reset/", token);
-            }
-            else {
-                sendSmsText();
-            }
+        }
+        else if (userDetail1 != null && verificationToken != null) {
+            token = verificationToken.getToken();
+        }
 
-
+        boolean isEmail = validateInputIsEmail(userDetail1);
+        if (isEmail) {
+            String url = "http://local";
+            sendEmail("http://localhost:4200/profile/edit/password/reset/", token);
+        }
+        else {
+            sendSmsText();
         }
     }
 
@@ -268,6 +312,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     private void sendSmsText() {
 
+    }
+
+    private boolean checkPassword(String password, String hasedPassword) {
+        return userPasswordEncoder1.matches(password, hasedPassword);
     }
 
 }

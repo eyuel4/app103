@@ -2,6 +2,8 @@ package com.fenast.app.ibextube.service.IService;
 
 import com.fenast.app.ibextube.db.model.resource.UserDetail;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
+import com.fenast.app.ibextube.http.PasswordRequest;
+import com.fenast.app.ibextube.http.ResponseMessageBase;
 
 import java.util.List;
 
@@ -18,4 +20,5 @@ public interface IUserDetailService {
     VerificationToken getVerificationToken(String verificationToken);
     void deleteVerificationToken(VerificationToken verificationToken);
     void requestUpdatePassword(UserDetail userDetail);
+    ResponseMessageBase updatePassword(String token , PasswordRequest passwordRequest) throws Exception;
 }

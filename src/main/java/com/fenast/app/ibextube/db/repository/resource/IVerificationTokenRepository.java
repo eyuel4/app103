@@ -18,4 +18,7 @@ public interface IVerificationTokenRepository extends JpaRepository<Verification
 
     @Query(value = "SELECT v.* FROM verificationToken v WHERE v.token= :token", nativeQuery = true)
     VerificationToken findByToken(@Param("token") String token);
+
+    @Query(value = "SELECT v.* FROM verificationToken v WHERE v.idUser= :userId AND v.type= :type", nativeQuery = true)
+    VerificationToken findByUserIdAndType(@Param("type") String type, @Param("userId") int userId);
 }

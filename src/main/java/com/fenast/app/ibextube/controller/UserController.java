@@ -6,6 +6,7 @@ import com.fenast.app.ibextube.db.model.authentication.User;
 import com.fenast.app.ibextube.db.model.resource.VerificationToken;
 import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
 import com.fenast.app.ibextube.exception.UserNotFoundException;
+import com.fenast.app.ibextube.http.PasswordRequest;
 import com.fenast.app.ibextube.http.ResponseMessageBase;
 import com.fenast.app.ibextube.http.UserDetailResponse;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
@@ -176,31 +177,8 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/edit/password/{token}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseMessageBase updatePassword(@PathVariable("token") String token, @RequestBody UserDetail userDetailInput ) throws Exception {
-        VerificationToken verificationToken = userDetailService.getVerificationToken(token);
-        if (verificationToken == null) {
-            throw new InvalidVerificationTokenException("Invalid password update link");
-        }
-
-        UserDetail userDetail = verificationToken.getUserDetail();
-        Calendar cal = Calendar.getInstance();
-        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
-        long diff = Math.abs(duration.toHours());
-        if (diff <= 0) {
-            // Throw link expired exception
-            throw new InvalidVerificationTokenException("Verification code expired!");
-        }
-
-        User user = userService.findUserById(userDetail.getIdUser());
-        user.setPassword(userPasswordEncoder.encode(userDetailInput.getPassword()));
-        userService.saveUser(user);
-
-        userDetailService.deleteVerificationToken(verificationToken);
-        ResponseMessageBase responseMessageBase = new ResponseMessageBase();
-        responseMessageBase.setSuccess(true);
-        responseMessageBase.setMessage_type(MessageType.Message_SUCCESS.getType());
-        responseMessageBase.setMessage("Your password is updated!");
-        return responseMessageBase;
+    public ResponseMessageBase updatePassword(@PathVariable("token") String token, @RequestBody PasswordRequest passwordRequest ) throws Exception {
+        return userDetailService.updatePassword(token, passwordRequest);
     }
 
     /**
