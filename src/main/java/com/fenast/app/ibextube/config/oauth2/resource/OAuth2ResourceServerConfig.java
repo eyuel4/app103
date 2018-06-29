@@ -47,6 +47,7 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
                 .antMatchers("/auth/**", "/ibex/api/signup").permitAll()
                 .antMatchers("/ibex/api/registeration/confirm/**").permitAll()
                 .antMatchers("/ibex/api/user/profile/upload").permitAll()
+                .antMatchers("/ibex/api/profile/edit/password/**").permitAll()
                 // .antMatchers("/swagger*", "/v2/**")
                 // .access("#oauth2.hasScope('read')")
                 .anyRequest().authenticated();

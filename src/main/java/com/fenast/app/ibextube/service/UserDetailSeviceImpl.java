@@ -18,6 +18,8 @@ import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import com.fenast.app.ibextube.util.EmailValidator;
 import com.fenast.app.ibextube.util.PhoneNumberValidator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -34,6 +36,8 @@ import java.util.UUID;
 @Service
 @Transactional
 public class UserDetailSeviceImpl implements IUserDetailService {
+
+    final static Log log = LogFactory.getLog(UserDetailSeviceImpl.class);
 
     @Autowired
     private IUserDetailRepository userRepository;
@@ -116,6 +120,8 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         boolean isPhone = false;
 
         if(userDetail1 != null) {
+            log.error("An Account with USERID already created");
+            log.debug("An Account with USERID already created");
             System.out.println("An account with USERID is saved");
             System.out.println("An Account with USERID already created");
             throw new UserExistException("User Account already exist!");
@@ -126,6 +132,8 @@ public class UserDetailSeviceImpl implements IUserDetailService {
                 isEmail =  validateInputIsEmail(userDetailInput);
             }
             else if (!isPhone && !isEmail) {
+                log.debug("Invalid User Input on UserDetailServiceImpl");
+                log.error("Invalid User Input on UserDetailServiceImpl");
                 throw new InvalidUserInputException("Invalid User Input");
             }
             User user = new User();
@@ -145,10 +153,11 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             userDetail.setLastName(userDetailInput.getLastName());
             userDetail.setPassword(userDetailInput.getPassword());
 
-            System.out.println("UserDetail Registered");
-
             UserDetail savedUserDetail = new UserDetail();
             savedUserDetail = saveUser(userDetail);
+            System.out.println("UserDetail Registered");
+            log.debug("User " + savedUserDetail.getUsername()+"UserDetail Registered");
+            log.error("User " + savedUserDetail.getUsername()+"UserDetail Registered");
 
             confirmRegisteration(savedUserDetail, isEmail, isPhone);
             return savedUserDetail;
@@ -177,7 +186,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         // Send confirmation code through email
         if(isEmail) {
             String token = UUID.randomUUID().toString();
-            createVerificationToken(userDetail, token, "SIGNUP");
+            createVerificationToken(userDetail, token, "SIGNUP_CONFIRMATION");
 
             String url = "http://localhost:4200/signup/confirm/";
             String xx = "http://localhost:4200/signup/confirm/"+token;
