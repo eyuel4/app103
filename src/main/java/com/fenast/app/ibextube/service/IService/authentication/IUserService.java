@@ -8,5 +8,5 @@ import com.fenast.app.ibextube.db.model.authentication.User;
 public interface IUserService {
     User findUserByName(String userName);
     User findUserById(int userById);
-    User saveUser(User user);
+    User saveUser(User user, boolean encode);
 }

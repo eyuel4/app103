@@ -12,7 +12,7 @@ public interface IUserDetailService {
     UserDetail findUserByName(String userName);
     UserDetail findUserById(int userById);
     boolean authenticateUser(String username, String password);
-    UserDetail saveUser(UserDetail userDetail);
+    UserDetail saveUser(UserDetail userDetail, boolean encode);
     void updateUserInfo(UserDetail userDetail);
     UserDetail signupUser(UserDetail userDetail);
     void confirmRegisteration(UserDetail userDetail, boolean isEmail, boolean isPhone);
@@ -20,5 +20,8 @@ public interface IUserDetailService {
     VerificationToken getVerificationToken(String verificationToken);
     void deleteVerificationToken(VerificationToken verificationToken);
     void requestUpdatePassword(UserDetail userDetail);
+    void requestRecoverPassword(UserDetail userDetail);
     ResponseMessageBase updatePassword(String token , PasswordRequest passwordRequest) throws Exception;
+    boolean isAcctActivated(int userId);
+    ResponseMessageBase updateForgotPassword(String token, PasswordRequest passwordRequest) throws Exception;
 }

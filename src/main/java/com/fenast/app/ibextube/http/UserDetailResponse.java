@@ -26,6 +26,9 @@ public class UserDetailResponse extends ResponseMessageBase {
     @ApiModelProperty(value = "mysubscription")
     private ChannelsResponse mySubscription;
 
+    @ApiModelProperty(value = "isAcctActivated")
+    private boolean isAcctActivated;
+
     public int getUserId() {
         return userId;
     }
@@ -72,5 +75,26 @@ public class UserDetailResponse extends ResponseMessageBase {
 
     public void setMySubscription(ChannelsResponse mySubscription) {
         this.mySubscription = mySubscription;
+    }
+
+    public boolean isAcctActivated() {
+        return isAcctActivated;
+    }
+
+    public void setAcctActivated(boolean acctActivated) {
+        isAcctActivated = acctActivated;
+    }
+
+    @Override
+    public String toString() {
+        return "UserDetailResponse{" +
+                "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", middleName='" + middleName + '\'' +
+                ", photoUrl='" + photoUrl + '\'' +
+                ", mySubscription=" + mySubscription +
+                ", isAcctActivated=" + isAcctActivated +
+                '}';
     }
 }

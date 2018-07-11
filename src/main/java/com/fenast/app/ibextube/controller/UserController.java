@@ -117,11 +117,14 @@ public class UserController {
         }
         UserDetail user = userDetailService.findUserById(idNum);
 
+        boolean isVerified = userDetailService.isAcctActivated(idNum);
+
         UserDetailResponse userDetailResponse = new UserDetailResponse();
         userDetailResponse.setFirstName(user.getFirstName());
         userDetailResponse.setLastName(user.getLastName());
         userDetailResponse.setMiddleName(null);
         userDetailResponse.setPhotoUrl(user.getProfilePic());
+        userDetailResponse.setAcctActivated(isVerified);
 
         System.out.println(userDetailResponse);
         return userDetailResponse;
@@ -138,7 +141,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/registeration/confirm/{token}", method = RequestMethod.GET,consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseMessageBase confirmSignup(@PathVariable("token") String token) {
+    public ResponseMessageBase confirmSignup(@PathVariable("token") String token) throws Exception {
         System.out.println("I was here to delete token");
         VerificationToken verificationToken = userDetailService.getVerificationToken(token);
         if (verificationToken == null) {
@@ -165,7 +168,7 @@ public class UserController {
        // User user = userService.findUserByName(userDetail.getUsername());
         User user = userService.findUserById(userDetail.getIdUser());
         user.setConfirmed(true);
-        userService.saveUser(user);
+        userService.saveUser(user, false);
 
         userDetailService.deleteVerificationToken(verificationToken);
         ResponseMessageBase responseMessageBase = new ResponseMessageBase();
@@ -198,5 +201,28 @@ public class UserController {
         respMsgBase.setMessage_type(MessageType.Message_SUCCESS.getType());
         respMsgBase.setSuccess(true);
         return respMsgBase;
+    }
+
+    /**
+     * The following method generate Recover Link and will email or text to the user
+     * @param userDetail
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/profile/edit/password/recover", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseMessageBase getRecoverPasswordLink(@RequestBody UserDetail userDetail) throws Exception {
+        System.out.println("Password Recover I was called");
+        userDetailService.requestRecoverPassword(userDetail);
+
+        ResponseMessageBase respMsgBase = new ResponseMessageBase();
+        respMsgBase.setMessage("Password recover link sent to " + MaskHelper.maskEmail(userDetail.getUsername()));
+        respMsgBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        respMsgBase.setSuccess(true);
+        return respMsgBase;
+    }
+
+    @RequestMapping(value = "/profile/edit/password/recover/{token}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseMessageBase changeForgotPassword(@PathVariable("token") String token, @RequestBody PasswordRequest passwordRequest) throws Exception {
+        return userDetailService.updateForgotPassword(token, passwordRequest);
     }
 }

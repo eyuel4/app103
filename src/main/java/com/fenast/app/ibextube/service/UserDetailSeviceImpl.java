@@ -11,6 +11,7 @@ import com.fenast.app.ibextube.db.repository.resource.IVerificationTokenReposito
 import com.fenast.app.ibextube.exception.InvalidUserInputException;
 import com.fenast.app.ibextube.exception.InvalidVerificationTokenException;
 import com.fenast.app.ibextube.exception.UserExistException;
+import com.fenast.app.ibextube.exception.UserNotFoundException;
 import com.fenast.app.ibextube.http.PasswordRequest;
 import com.fenast.app.ibextube.http.ResponseMessageBase;
 import com.fenast.app.ibextube.service.IService.IEmailService;
@@ -102,8 +103,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     }
 
     @Override
-    public UserDetail saveUser(UserDetail userDetail) {
-        userDetail.setPassword(userPasswordEncoder1.encode(userDetail.getPassword()));
+    public UserDetail saveUser(UserDetail userDetail, boolean encode) {
+        if (encode) {
+            userDetail.setPassword(userPasswordEncoder1.encode(userDetail.getPassword()));
+        }
         return userRepository.save(userDetail);
     }
 
@@ -144,7 +147,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             user.setCredentialsExpired(true);
             user.setAccountExpired(true);
             user.setConfirmed(false);
-            User savedUser = userService.saveUser(user);
+            User savedUser = userService.saveUser(user, true);
 
             UserDetail userDetail = new UserDetail();
             userDetail.setIdUser(savedUser.getId());
@@ -154,7 +157,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             userDetail.setPassword(userDetailInput.getPassword());
 
             UserDetail savedUserDetail = new UserDetail();
-            savedUserDetail = saveUser(userDetail);
+            savedUserDetail = saveUser(userDetail, true);
             System.out.println("UserDetail Registered");
             log.debug("User " + savedUserDetail.getUsername()+"UserDetail Registered");
             log.error("User " + savedUserDetail.getUsername()+"UserDetail Registered");
@@ -241,10 +244,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         }
 
         UserDetail userDetail = verificationToken.getUserDetail();
-        Calendar cal = Calendar.getInstance();
-        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
-        long diff = Math.abs(duration.toHours());
-        if (diff <= 0) {
+        if (!isTokenExpired(verificationToken)) {
             // Throw link expired exception
             throw new InvalidVerificationTokenException("Verification code expired!");
         }
@@ -255,7 +255,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             if (checkPassword(passwordRequest.getOldPassword(), user.getPassword())) {
                 //user.setPassword(userPasswordEncoder1.encode(passwordRequest.getNewPassword()));
                 user.setPassword(passwordRequest.getNewPassword());
-                userService.saveUser(user);
+                userService.saveUser(user, true);
                 deleteVerificationToken(verificationToken);
             } else {
                 throw new InvalidVerificationTokenException("Invalid Password");
@@ -308,6 +308,32 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         }
     }
 
+    @Override
+    public void requestRecoverPassword(UserDetail userDetail) {
+        UserDetail userDetail1 = userRepository.findByUserName(userDetail.getUsername());
+        if (userDetail1 == null) {
+            throw new UserNotFoundException("User Account Not Found");
+        }
+        VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("Recover_password",userDetail1.getIdUser());
+
+        String token = null;
+        if (userDetail1 != null && verificationToken == null) {
+            token = UUID.randomUUID().toString();
+            createVerificationToken(userDetail1, token, "Recover_password");
+        }
+        else if (userDetail1 != null && verificationToken != null) {
+            token = verificationToken.getToken();
+        }
+        boolean isEmail = validateInputIsEmail(userDetail1);
+        if (isEmail) {
+            String url = "http://local";
+            sendEmail("http://localhost:4200/profile/edit/password/recover/", token);
+        }
+        else {
+            sendSmsText();
+        }
+    }
+
     private void sendEmail(String url, String token) {
         String xx = url+token;
         String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
@@ -325,6 +351,56 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     private boolean checkPassword(String password, String hasedPassword) {
         return userPasswordEncoder1.matches(password, hasedPassword);
+    }
+
+    @Override
+    public boolean isAcctActivated(int userId) {
+       VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("SIGNUP_CONFIRMATION", userId);
+       if (verificationToken != null) {
+           return false;
+       } else {
+           return true;
+       }
+    }
+
+    @Override
+    public ResponseMessageBase updateForgotPassword(String token, PasswordRequest passwordRequest) throws Exception {
+        VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType("Recover_password", token);
+        if (verificationToken == null) {
+            throw new InvalidVerificationTokenException("Invalid password update link");
+        }
+
+        UserDetail userDetail = verificationToken.getUserDetail();
+
+        if (!isTokenExpired(verificationToken)) {
+            // Throw link expired exception
+            throw new InvalidVerificationTokenException("Verification code expired!");
+        }
+
+        User user = userService.findUserById(userDetail.getIdUser());
+        if (user != null) {
+            user.setPassword(passwordRequest.getNewPassword());
+            userService.saveUser(user, true);
+            deleteVerificationToken(verificationToken);
+        } else {
+            throw new InvalidVerificationTokenException("Invalid Password");
+        }
+
+        ResponseMessageBase responseMessageBase = new ResponseMessageBase();
+        responseMessageBase.setSuccess(true);
+        responseMessageBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        responseMessageBase.setMessage("Your password is updated!");
+        return responseMessageBase;
+    }
+
+    private boolean isTokenExpired(VerificationToken verificationToken) {
+        Calendar cal = Calendar.getInstance();
+        Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
+        long diff = Math.abs(duration.toHours());
+        if (diff <= 0) {
+            return false;
+        }
+        else { return true; }
     }
 
 }
