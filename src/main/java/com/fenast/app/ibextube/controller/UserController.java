@@ -221,8 +221,26 @@ public class UserController {
         return respMsgBase;
     }
 
+    /**
+     * The following url is to change password
+     * @param token
+     * @param passwordRequest
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/profile/edit/password/recover/{token}", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     private ResponseMessageBase changeForgotPassword(@PathVariable("token") String token, @RequestBody PasswordRequest passwordRequest) throws Exception {
         return userDetailService.updateForgotPassword(token, passwordRequest);
+    }
+
+    /**
+     * The following method generate Activation Link and will text or email to the user
+     * @param userDetail
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/profile/activate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    private ResponseMessageBase getActivateAccountLink(@RequestBody UserDetail userDetail) throws Exception {
+        return userDetailService.requestActivateAccount(userDetail);
     }
 }

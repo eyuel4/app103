@@ -16,7 +16,7 @@ public interface IUserDetailService {
     void updateUserInfo(UserDetail userDetail);
     UserDetail signupUser(UserDetail userDetail);
     void confirmRegisteration(UserDetail userDetail, boolean isEmail, boolean isPhone);
-    void createVerificationToken(UserDetail userDetail, String token, String type);
+    VerificationToken createVerificationToken(UserDetail userDetail, String type);
     VerificationToken getVerificationToken(String verificationToken);
     void deleteVerificationToken(VerificationToken verificationToken);
     void requestUpdatePassword(UserDetail userDetail);
@@ -24,4 +24,5 @@ public interface IUserDetailService {
     ResponseMessageBase updatePassword(String token , PasswordRequest passwordRequest) throws Exception;
     boolean isAcctActivated(int userId);
     ResponseMessageBase updateForgotPassword(String token, PasswordRequest passwordRequest) throws Exception;
+    ResponseMessageBase requestActivateAccount(UserDetail userDetail) throws Exception;
 }

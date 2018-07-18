@@ -18,6 +18,7 @@ import com.fenast.app.ibextube.service.IService.IEmailService;
 import com.fenast.app.ibextube.service.IService.IUserDetailService;
 import com.fenast.app.ibextube.service.IService.authentication.IUserService;
 import com.fenast.app.ibextube.util.EmailValidator;
+import com.fenast.app.ibextube.util.MaskHelper;
 import com.fenast.app.ibextube.util.PhoneNumberValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -188,16 +189,17 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
         // Send confirmation code through email
         if(isEmail) {
-            String token = UUID.randomUUID().toString();
-            createVerificationToken(userDetail, token, "SIGNUP_CONFIRMATION");
+            //String token = UUID.randomUUID().toString();
+            VerificationToken verificationToken = createVerificationToken(userDetail, "ACCOUNT_CONFIRMATION");
 
             String url = "http://localhost:4200/signup/confirm/";
-            String xx = "http://localhost:4200/signup/confirm/"+token;
+            String xx = "http://localhost:4200/signup/confirm/"+verificationToken.getToken();
             String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
             System.out.println(xx);
-            String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + token;
+            String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + verificationToken.getToken();
 
-            sendEmail(url, token);
+            String message = url + verificationToken.getToken();
+            sendEmail(userDetail,message);
             System.out.println(confirmationUrl);
             //emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
 
@@ -215,11 +217,11 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     /**
      * The following method will save the temporary url generated for signup verification or password reset
      * @param userDetail
-     * @param token
      * @param type
      */
     @Override
-    public void createVerificationToken(UserDetail userDetail, String token, String type) {
+    public VerificationToken createVerificationToken(UserDetail userDetail, String type) {
+        String token = UUID.randomUUID().toString();
         VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
 
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -228,7 +230,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         System.out.println(expirdate + "expired");
         verificationToken.setExpiryDate(expirdate);
 
-        verificationTokenRepository.save(verificationToken);
+        return verificationTokenRepository.save(verificationToken);
     }
 
     @Override
@@ -291,23 +293,22 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
         String token = null;
         if (userDetail1 != null && verificationToken == null) {
-            token = UUID.randomUUID().toString();
-            createVerificationToken(userDetail1, token, "Update_password");
+            //token = UUID.randomUUID().toString();
+            createVerificationToken(userDetail1,"Update_password");
         }
         else if (userDetail1 != null && verificationToken != null) {
             token = verificationToken.getToken();
         }
+        String url = "http://localhost:4200/profile/edit/password/reset/";
+        String message = url + token;
 
-        boolean isEmail = validateInputIsEmail(userDetail1);
-        if (isEmail) {
-            String url = "http://local";
-            sendEmail("http://localhost:4200/profile/edit/password/reset/", token);
-        }
-        else {
-            sendSmsText();
-        }
+        sendMessageToUser(userDetail, message);
     }
 
+    /**
+     * Send Recover Password link with token to the User
+     * @param userDetail
+     */
     @Override
     public void requestRecoverPassword(UserDetail userDetail) {
         UserDetail userDetail1 = userRepository.findByUserName(userDetail.getUsername());
@@ -318,33 +319,50 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
         String token = null;
         if (userDetail1 != null && verificationToken == null) {
-            token = UUID.randomUUID().toString();
-            createVerificationToken(userDetail1, token, "Recover_password");
+            //token = UUID.randomUUID().toString();
+            verificationToken = createVerificationToken(userDetail1, "Recover_password");
+            token = verificationToken.getToken();
         }
         else if (userDetail1 != null && verificationToken != null) {
             token = verificationToken.getToken();
         }
-        boolean isEmail = validateInputIsEmail(userDetail1);
+        String url = "http://localhost:4200/profile/edit/password/recover/";
+        String message = url + token;
+        sendMessageToUser(userDetail, message);
+    }
+
+    /**
+     * The following method check if the user has signup with phone/email
+     * and send text/email to user
+     * @param userDetail
+     * @param message
+     */
+    private void sendMessageToUser(UserDetail userDetail, String message) {
+        boolean isEmail = validateInputIsEmail(userDetail);
         if (isEmail) {
-            String url = "http://local";
-            sendEmail("http://localhost:4200/profile/edit/password/recover/", token);
-        }
-        else {
-            sendSmsText();
+            sendEmail(userDetail, message);
         }
     }
 
-    private void sendEmail(String url, String token) {
-        String xx = url+token;
-        String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
-        System.out.println(xx);
-        String confirmationUrl = url  + token;
-        System.out.println(confirmationUrl);
-        System.out.println(xx);
+    /**
+     * Send email with message as body to the user
+     * @param userDetail
+     * @param message
+     */
+    private void sendEmail(UserDetail userDetail, String message) {
+        //String xx = url+token;
+        String xy = "<html><body><a href='"+message+"'>Confirm Email</a></body></html>";
+        System.out.println(message);
+        //String confirmationUrl = url  + token;
+        System.out.println(message);
+        System.out.println(message);
 
         // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
     }
 
+    /**
+     * Send SMS Text
+     */
     private void sendSmsText() {
 
     }
@@ -353,9 +371,14 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         return userPasswordEncoder1.matches(password, hasedPassword);
     }
 
+    /**
+     * Check if Account is activated or not
+     * @param userId
+     * @return
+     */
     @Override
     public boolean isAcctActivated(int userId) {
-       VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("SIGNUP_CONFIRMATION", userId);
+       VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("ACCOUNT_CONFIRMATION", userId);
        if (verificationToken != null) {
            return false;
        } else {
@@ -363,6 +386,13 @@ public class UserDetailSeviceImpl implements IUserDetailService {
        }
     }
 
+    /**
+     * Change forgotten Password
+     * @param token
+     * @param passwordRequest
+     * @return
+     * @throws Exception
+     */
     @Override
     public ResponseMessageBase updateForgotPassword(String token, PasswordRequest passwordRequest) throws Exception {
         VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType("Recover_password", token);
@@ -393,6 +423,11 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         return responseMessageBase;
     }
 
+    /**
+     * Check if a toke is expired or not
+     * @param verificationToken
+     * @return
+     */
     private boolean isTokenExpired(VerificationToken verificationToken) {
         Calendar cal = Calendar.getInstance();
         Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
@@ -401,6 +436,44 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             return false;
         }
         else { return true; }
+    }
+
+    /**
+     * The following method will create a token for activating user account
+     * @param userDetail
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public ResponseMessageBase requestActivateAccount(UserDetail userDetail) throws Exception {
+        VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("ACCOUNT_CONFIRMATION", userDetail.getIdUser());
+        UserDetail userDetail1 = verificationToken.getUserDetail();
+        VerificationToken newVerifiationToken = null;
+        boolean isEmail = validateInputIsEmail(userDetail1);
+        boolean isNumber = validateInputIsPhone(userDetail1);
+
+        if (verificationToken != null) {
+            if (isTokenExpired(verificationToken)) {
+                deleteVerificationToken(verificationToken);
+                newVerifiationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
+            }
+        }
+        if (verificationToken == null && userDetail != null) {
+            newVerifiationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
+        }
+
+        if (isEmail) {
+            String message = "http://localhost:4200/signup/confirm/"+newVerifiationToken.getToken();
+            sendEmail(userDetail1, message);
+        } else if (isNumber) {
+            // Send a text with confirmation code
+        }
+
+        ResponseMessageBase respMsgBase = new ResponseMessageBase();
+        respMsgBase.setMessage("Activation password send on email/phone "+ MaskHelper.maskEmail(userDetail1.getUsername()));
+        respMsgBase.setMessage_type(MessageType.Message_SUCCESS.getType());
+        respMsgBase.setSuccess(true);
+        return respMsgBase;
     }
 
 }

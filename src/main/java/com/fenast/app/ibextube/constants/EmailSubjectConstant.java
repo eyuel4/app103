@@ -4,7 +4,7 @@ package com.fenast.app.ibextube.constants;
  * Created by taddesee on 5/21/2018.
  */
 public enum EmailSubjectConstant {
-    SIGNUP_CONFIRMATION("REGISTERATION CONFIRMATION");
+    SIGNUP_CONFIRMATION("ACCOUNT CONFIRMATION");
 
     EmailSubjectConstant(String emailSubject) {
     }
