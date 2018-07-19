@@ -246,7 +246,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         }
 
         UserDetail userDetail = verificationToken.getUserDetail();
-        if (!isTokenExpired(verificationToken)) {
+        if (isTokenExpired(verificationToken)) {
             // Throw link expired exception
             throw new InvalidVerificationTokenException("Verification code expired!");
         }
@@ -402,7 +402,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
         UserDetail userDetail = verificationToken.getUserDetail();
 
-        if (!isTokenExpired(verificationToken)) {
+        if (isTokenExpired(verificationToken)) {
             // Throw link expired exception
             throw new InvalidVerificationTokenException("Verification code expired!");
         }
@@ -433,9 +433,9 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         Duration duration = Duration.between(LocalDateTime.now(), verificationToken.getExpiryDate());
         long diff = Math.abs(duration.toHours());
         if (diff <= 0) {
-            return false;
+            return true;
         }
-        else { return true; }
+        else { return false; }
     }
 
     /**
@@ -448,22 +448,21 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     public ResponseMessageBase requestActivateAccount(UserDetail userDetail) throws Exception {
         VerificationToken verificationToken = verificationTokenRepository.findByUserIdAndType("ACCOUNT_CONFIRMATION", userDetail.getIdUser());
         UserDetail userDetail1 = verificationToken.getUserDetail();
-        VerificationToken newVerifiationToken = null;
         boolean isEmail = validateInputIsEmail(userDetail1);
         boolean isNumber = validateInputIsPhone(userDetail1);
 
         if (verificationToken != null) {
             if (isTokenExpired(verificationToken)) {
                 deleteVerificationToken(verificationToken);
-                newVerifiationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
+                verificationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
             }
         }
         if (verificationToken == null && userDetail != null) {
-            newVerifiationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
+            verificationToken = createVerificationToken(userDetail1, "ACCOUNT_CONFIRMATION");
         }
 
         if (isEmail) {
-            String message = "http://localhost:4200/signup/confirm/"+newVerifiationToken.getToken();
+            String message = "http://localhost:4200/signup/confirm/"+verificationToken.getToken();
             sendEmail(userDetail1, message);
         } else if (isNumber) {
             // Send a text with confirmation code
