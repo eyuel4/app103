@@ -105,10 +105,16 @@ public class UserDetailSeviceImpl implements IUserDetailService {
 
     @Override
     public UserDetail saveUser(UserDetail userDetail, boolean encode) {
-        if (encode) {
-            userDetail.setPassword(userPasswordEncoder1.encode(userDetail.getPassword()));
+        try {
+            if (encode) {
+                userDetail.setPassword(userPasswordEncoder1.encode(userDetail.getPassword()));
+            }
+            return userRepository.save(userDetail);
+        } catch (Exception e) {
+            log.debug("Exception on saveUser", e);
+            log.error("Exception thrown on saveUser", e);
+            throw e;
         }
-        return userRepository.save(userDetail);
     }
 
     @Override
@@ -196,11 +202,13 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             String xx = "http://localhost:4200/signup/confirm/"+verificationToken.getToken();
             String xy = "<html><body><a href='"+xx+"'>Confirm Email</a></body></html>";
             System.out.println(xx);
+            log.debug(xx);
             String confirmationUrl = AppUrlConstant.FRONT_END_APP_BASE_URL.getUrl() +""+ RestEndpointConstants.SIGNUP_CONFIRM.getEndpoint() + verificationToken.getToken();
 
             String message = url + verificationToken.getToken();
             sendEmail(userDetail,message);
             System.out.println(confirmationUrl);
+            log.debug(confirmationUrl);
             //emailService.sendSimpleMessage(userDetail.getUsername(), EmailSubjectConstant.SIGNUP_CONFIRMATION.getEmailSubject(), xy);
 
            // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
@@ -221,16 +229,26 @@ public class UserDetailSeviceImpl implements IUserDetailService {
      */
     @Override
     public VerificationToken createVerificationToken(UserDetail userDetail, String type) {
-        String token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
+        try {
+            String token = UUID.randomUUID().toString();
+            VerificationToken verificationToken = new VerificationToken(token, userDetail, type);
 
-        LocalDateTime localDateTime = LocalDateTime.now();
-        System.out.println(localDateTime + "registered");
-        LocalDateTime expirdate = localDateTime.plusDays(1);
-        System.out.println(expirdate + "expired");
-        verificationToken.setExpiryDate(expirdate);
+            LocalDateTime localDateTime = LocalDateTime.now();
+            System.out.println(localDateTime + "registered");
+            LocalDateTime expirdate = localDateTime.plusDays(1);
+            System.out.println(expirdate + "expired");
+            verificationToken.setExpiryDate(expirdate);
 
-        return verificationTokenRepository.save(verificationToken);
+            return verificationTokenRepository.save(verificationToken);
+        } catch (InvalidVerificationTokenException e) {
+            log.debug("InvalidVerificationTokenException Exception caught on updatePassword", e);
+            log.error("InvalidVerificationTokenException Exception caught on updatePassword", e);
+            throw e;
+        } catch (Exception e) {
+            log.debug("Exception caught on updatePassword", e);
+            log.error("Exception caught on updatePassword", e);
+            throw e;
+        }
     }
 
     @Override
@@ -248,7 +266,9 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         UserDetail userDetail = verificationToken.getUserDetail();
         if (isTokenExpired(verificationToken)) {
             // Throw link expired exception
-            throw new InvalidVerificationTokenException("Verification code expired!");
+            InvalidVerificationTokenException e = new InvalidVerificationTokenException("Verification code expired!");
+            log.debug("InvalidVerificationTokenException Exception caught on updatePassword", e);
+            log.error("InvalidVerificationTokenException Exception caught on updatePassword", e);
         }
 
         User user = userService.findUserById(userDetail.getIdUser());
@@ -260,7 +280,10 @@ public class UserDetailSeviceImpl implements IUserDetailService {
                 userService.saveUser(user, true);
                 deleteVerificationToken(verificationToken);
             } else {
-                throw new InvalidVerificationTokenException("Invalid Password");
+                InvalidVerificationTokenException e = new InvalidVerificationTokenException("Invalid Password");
+                log.debug("InvalidVerificationTokenException Exception caught on updatePassword", e);
+                log.error("InvalidVerificationTokenException Exception caught on updatePassword", e);
+                throw e;
             }
         }
 
@@ -277,7 +300,12 @@ public class UserDetailSeviceImpl implements IUserDetailService {
      */
     @Override
     public void deleteVerificationToken(VerificationToken verificationToken) {
-        verificationTokenRepository.delete(verificationToken);
+        try {
+            verificationTokenRepository.delete(verificationToken);
+        } catch (Exception e) {
+            log.debug("Exception caught on deleteVerificationToken", e);
+            log.error("Exception caught on deleteVerificationToken", e);
+        }
     }
 
     /**
@@ -356,6 +384,7 @@ public class UserDetailSeviceImpl implements IUserDetailService {
         //String confirmationUrl = url  + token;
         System.out.println(message);
         System.out.println(message);
+        log.debug("Send email to :" + userDetail.getUsername());
 
         // emailService.sendMessageWithAttachement(userDetail.getUsername(), "SignUp Confirmation", xy, null);
     }
@@ -397,14 +426,19 @@ public class UserDetailSeviceImpl implements IUserDetailService {
     public ResponseMessageBase updateForgotPassword(String token, PasswordRequest passwordRequest) throws Exception {
         VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType("Recover_password", token);
         if (verificationToken == null) {
-            throw new InvalidVerificationTokenException("Invalid password update link");
+            InvalidVerificationTokenException verificationTokenException = new InvalidVerificationTokenException("Invalid password update link");
+            log.debug("Invalid Verification TokenException on UpdateForgotPassword", verificationTokenException);
+            log.error("Invalid Verification TokenException thrown", verificationTokenException);
+            throw verificationTokenException;
         }
 
         UserDetail userDetail = verificationToken.getUserDetail();
 
         if (isTokenExpired(verificationToken)) {
             // Throw link expired exception
-            throw new InvalidVerificationTokenException("Verification code expired!");
+            InvalidVerificationTokenException verificationTokenException = new InvalidVerificationTokenException("Verification code expired!");
+            log.debug("Invalid Verification TokenException on UpdateForgotPassword", verificationTokenException);
+            log.error("Invalid Verification TokenException thrown", verificationTokenException);
         }
 
         User user = userService.findUserById(userDetail.getIdUser());
@@ -413,7 +447,9 @@ public class UserDetailSeviceImpl implements IUserDetailService {
             userService.saveUser(user, true);
             deleteVerificationToken(verificationToken);
         } else {
-            throw new InvalidVerificationTokenException("Invalid Password");
+            InvalidVerificationTokenException verificationTokenException = new InvalidVerificationTokenException("Invalid Password");
+            log.debug("Invalid Verification TokenException on UpdateForgotPassword", verificationTokenException);
+            log.error("Invalid Verification TokenException thrown", verificationTokenException);
         }
 
         ResponseMessageBase responseMessageBase = new ResponseMessageBase();
